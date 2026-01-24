@@ -3,6 +3,7 @@
 Educational Management System (EMS) frontend authentication module.
 
 ## 🚀 Tech Stack
+
 - React 18 + Vite
 - React Router DOM v6
 - Tailwind CSS
@@ -10,5 +11,3 @@ Educational Management System (EMS) frontend authentication module.
 - React Hook Form
 - React Toastify
 - Lucide React
-
-
