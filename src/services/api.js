@@ -30,11 +30,14 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    console.log('📤 API Request:', config.method.toUpperCase(), config.url);
+
     // Return the modified config to proceed with the request
     return config;
   },
   (error) => {
     // If there's an error in the request setup, reject the promise
+    console.error('❌ Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -44,19 +47,23 @@ apiClient.interceptors.request.use(
 // It handles both successful responses and errors globally
 apiClient.interceptors.response.use(
   (response) => {
+    console.log('📥 API Response:', response.status, response.config.url);
     // On successful response, return only the data portion
     // This simplifies response handling in components
     return response.data;
   },
   (error) => {
+    console.error('❌ API Error:', error);
+
     // Handle different types of errors based on status codes
     if (error.response) {
-      const { status } = error.response;
+      const { status, data } = error.response;
 
       switch (status) {
         case 401:
           // Unauthorized: Token is invalid or expired
           // Clear stored authentication data
+          console.log('🔒 Unauthorized - Clearing auth');
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user_role');
           localStorage.removeItem('user_data');
@@ -65,11 +72,12 @@ apiClient.interceptors.response.use(
           toast.error('Session expired. Please login again.');
 
           // Redirect to login page
-          window.location.href = '/auth/login';
+          window.location.href = '/login';
           break;
 
         case 403:
           // Forbidden: User doesn't have permission
+          console.log('⛔ Access denied');
           toast.error(
             'Access denied. You do not have permission to perform this action.'
           );
@@ -77,21 +85,25 @@ apiClient.interceptors.response.use(
 
         case 500:
           // Internal Server Error
+          console.log('💥 Server error');
           toast.error('Server error occurred. Please try again later.');
           break;
 
         default: {
           // Other errors: Show generic message or specific message from server
-          const message = error.response.data?.message || 'An error occurred';
+          const message = data?.message || 'An error occurred';
+          console.log(`⚠️ Error ${status}:`, message);
           toast.error(message);
           break;
         }
       }
     } else if (error.request) {
       // Network error: Request was made but no response received
+      console.error('📡 No response from server');
       toast.error('Network error. Please check your internet connection.');
     } else {
       // Other errors: Something else happened
+      console.error('⚙️ Request setup error');
       toast.error('An unexpected error occurred.');
     }
 

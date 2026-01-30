@@ -30,21 +30,46 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = async (userId, password) => {
-    const response = await authLogin(userId, password);
+    try {
+      console.log('📝 AuthContext: Starting login...');
+      const response = await authLogin(userId, password);
 
-    // Extract user data and token from response
-    const { user: userData, token: authToken } = response;
+      console.log('📥 AuthContext: Received response:', response);
 
-    // Update state
-    setUser(userData);
-    setToken(authToken);
-    setIsAuthenticated(true);
+      // FIX: Handle both mock and real API response structures
+      // Mock response: { token, user, success }
+      // Real API response: { data: { token, user }, success }
+      const userData = response.user || response.data?.user;
+      const authToken = response.token || response.data?.token;
 
-    // Save to localStorage
-    localStorage.setItem('auth_token', authToken);
-    localStorage.setItem('user_data', JSON.stringify(userData));
+      console.log('🔍 AuthContext: Extracted userData:', userData);
+      console.log('🔍 AuthContext: Extracted token:', authToken);
 
-    return response;
+      if (!userData || !authToken) {
+        console.error('❌ AuthContext: Invalid response structure:', response);
+        throw new Error('Invalid response: missing user or token');
+      }
+
+      // Update state
+      setUser(userData);
+      setToken(authToken);
+      setIsAuthenticated(true);
+
+      console.log('✅ AuthContext: State updated successfully');
+      console.log('👤 AuthContext: User role:', userData.role);
+
+      // Save to localStorage
+      localStorage.setItem('auth_token', authToken);
+      localStorage.setItem('user_data', JSON.stringify(userData));
+
+      console.log('💾 AuthContext: Saved to localStorage');
+
+      // Return the response for LoginPage to use
+      return { user: userData, token: authToken, success: true };
+    } catch (error) {
+      console.error('❌ AuthContext Login Error:', error);
+      throw error;
+    }
   };
 
   // Logout function

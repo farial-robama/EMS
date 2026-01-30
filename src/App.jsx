@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,56 +8,17 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Toast from './components/common/Toast';
 
-// Auth Pages
-import LoginPage from './pages/auth/LoginPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// Routes
+import routes from './routes/routes';
+import { Suspense } from 'react';
+import LoadingSpinner from './components/common/LoadingSpinner';
 
-// Placeholder Dashboard Components (to be replaced with actual components)
-const SuperAdminDashboard = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        Super Admin Dashboard
-      </h1>
-      <p className="text-gray-600">Welcome, Super Administrator!</p>
-    </div>
-  </div>
-);
 
-const AdminDashboard = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">Admin Dashboard</h1>
-      <p className="text-gray-600">Welcome, Administrator!</p>
-    </div>
-  </div>
-);
-
-const TeacherDashboard = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        Teacher Dashboard
-      </h1>
-      <p className="text-gray-600">Welcome, Teacher!</p>
-    </div>
-  </div>
-);
-
-const StudentDashboard = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        Student Dashboard
-      </h1>
-      <p className="text-gray-600">Welcome, Student!</p>
-    </div>
-  </div>
-);
 
 // Route Guard Component for authenticated users
 const AuthenticatedRoute = ({ children }) => {
@@ -93,6 +54,42 @@ const AuthenticatedRoute = ({ children }) => {
 
 // Main App Component
 const AppRoutes = () => {
+  // Page wrapper adds title and breadcrumbs
+  const PageWrapper = ({ meta, children }) => {
+    const title = meta?.title ? `${meta.title} • Educational Management System` : 'Educational Management System';
+
+    useEffect(() => {
+      document.title = title;
+    }, [title]);
+
+    return (
+      <div className="p-6">
+        {meta?.breadcrumbs && meta.breadcrumbs.length > 0 && (
+          <nav className="text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
+            <ol className="flex items-center gap-2">
+              {meta.breadcrumbs.map((b, i) => (
+                <li key={i} className="flex items-center">
+                  {b.path ? (
+                    <Link to={b.path} className="hover:underline">
+                      {b.label}
+                    </Link>
+                  ) : (
+                    <span>{b.label}</span>
+                  )}
+                  {i < meta.breadcrumbs.length - 1 && (
+                    <ChevronRight className="h-4 w-4 mx-2 text-gray-400" />
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        {children}
+      </div>
+    );
+  };
+
   return (
     <Routes>
       {/* Default route - redirects based on auth status */}
@@ -105,50 +102,35 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Authentication Routes */}
-      <Route path="/auth/login" element={<LoginPage />} />
-      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+      {/* Dynamic routes configured from src/routes/routes.jsx */}
+      {routes.map((r) => {
+        const Page = r.element;
+        const PageWithMeta = (props) => (
+          <PageWrapper meta={r}>
+            <Page {...props} />
+          </PageWrapper>
+        );
 
-      {/* Super Admin Routes */}
-      <Route
-        path="/super-admin/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['super_admin']}>
-            <SuperAdminDashboard />
+        const pageElement = r.protected ? (
+          <ProtectedRoute allowedRoles={r.allowedRoles}>
+            <PageWithMeta />
           </ProtectedRoute>
-        }
-      />
+        ) : (
+          <PageWithMeta />
+        );
 
-      {/* Admin Routes */}
-      <Route
-        path="/admin/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Teacher Routes */}
-      <Route
-        path="/teacher/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['teacher']}>
-            <TeacherDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Student Routes */}
-      <Route
-        path="/student/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['student']}>
-            <StudentDashboard />
-          </ProtectedRoute>
-        }
-      />
+        return (
+          <Route
+            key={r.path}
+            path={r.path}
+            element={
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>}>
+                {pageElement}
+              </Suspense>
+            }
+          />
+        );
+      })}
 
       {/* Catch-all route - redirect to login for unknown routes */}
       <Route path="*" element={<Navigate to="/auth/login" replace />} />

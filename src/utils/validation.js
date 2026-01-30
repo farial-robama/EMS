@@ -1,25 +1,34 @@
 // src/utils/validation.js
 
 export const validateUserId = (userId) => {
-  if (!userId) {
+  if (!userId || userId.trim() === '') {
     return { isValid: false, message: 'User ID is required' };
   }
 
-  const studentRegex = /^STU\d{6}$/;
-  const teacherRegex = /^TCH\d{6}$/;
-  const adminRegex = /^ADM\d{6}$/; // Assuming admin format
+  const trimmedId = userId.trim();
 
-  if (
-    studentRegex.test(userId) ||
-    teacherRegex.test(userId) ||
-    adminRegex.test(userId)
-  ) {
-    return { isValid: true, message: '' };
+  // Check for Student ID format: STU + 6 digits
+  const studentPattern = /^STU\d{6}$/;
+  if (studentPattern.test(trimmedId)) {
+    return { isValid: true };
+  }
+
+  // Check for Teacher ID format: TCH + 6 digits
+  const teacherPattern = /^TCH\d{6}$/;
+  if (teacherPattern.test(trimmedId)) {
+    return { isValid: true };
+  }
+
+  // Allow admin usernames (alphanumeric, 3-20 chars)
+  const adminPattern = /^[a-zA-Z0-9]{3,20}$/;
+  if (adminPattern.test(trimmedId)) {
+    return { isValid: true };
   }
 
   return {
     isValid: false,
-    message: 'Invalid User ID format. Must be STU/ADM/TCH followed by 6 digits',
+    message:
+      'Invalid User ID format. Use STU000000, TCH000000, or admin username',
   };
 };
 

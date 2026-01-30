@@ -3,6 +3,61 @@
 import apiClient from './api.js';
 
 /**
+ * MOCK USER DATABASE (For Testing Only)
+ * Remove this when connecting to real backend
+ */
+const MOCK_USERS = [
+  {
+    userId: 'admin',
+    password: 'admin123',
+    user: {
+      id: '1',
+      userId: 'admin',
+      name: 'Super Admin',
+      email: 'admin@advanceitsolutions.com',
+      role: 'super_admin',
+      permissions: ['*'],
+    },
+  },
+  {
+    userId: 'test',
+    password: 'test123',
+    user: {
+      id: '1.5',
+      userId: 'test',
+      name: 'Test Admin',
+      email: 'test@advanceitsolutions.com',
+      role: 'super_admin',
+      permissions: ['*'],
+    },
+  },
+  {
+    userId: 'STU000001',
+    password: 'STU000001',
+    user: {
+      id: '2',
+      userId: 'STU000001',
+      name: 'John Doe',
+      email: 'john@student.com',
+      role: 'student',
+      permissions: [],
+    },
+  },
+  {
+    userId: 'TCH000001',
+    password: 'TCH000001',
+    user: {
+      id: '3',
+      userId: 'TCH000001',
+      name: 'Jane Smith',
+      email: 'jane@teacher.com',
+      role: 'teacher',
+      permissions: [],
+    },
+  },
+];
+
+/**
  * Authenticates a user with userId and password
  * @param {string} userId - The user's ID (e.g., STU001234, TCH001234)
  * @param {string} password - The user's password
@@ -11,13 +66,46 @@ import apiClient from './api.js';
  */
 export const login = async (userId, password) => {
   try {
-    const response = await apiClient.post('/api/auth/login', {
-      userId,
-      password,
+    console.log('🔐 Attempting login with:', { userId, password });
+    console.log(
+      '📊 Available mock users:',
+      MOCK_USERS.map((u) => u.userId)
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Debug: Check each user
+    MOCK_USERS.forEach((u) => {
+      console.log(
+        `Checking user: ${u.userId} - Match ID: ${u.userId === userId}, Match Pass: ${u.password === password}`
+      );
     });
-    return response;
+
+    const mockUser = MOCK_USERS.find(
+      (u) => u.userId === userId && u.password === password
+    );
+
+    if (!mockUser) {
+      console.error(
+        '❌ User not found. Credentials do not match any mock user.'
+      );
+      throw new Error('Invalid User ID or Password');
+    }
+
+    const mockToken = `mock_token_${Date.now()}`;
+
+    console.log('✅ Login successful:', mockUser.user);
+    console.log('🎫 Generated token:', mockToken);
+
+    return {
+      success: true,
+      token: mockToken,
+      user: mockUser.user,
+      message: 'Login successful',
+    };
   } catch (error) {
-    throw new Error(error.message || 'Login failed');
+    console.error('❌ Login error:', error.message);
+    throw error;
   }
 };
 
@@ -27,18 +115,17 @@ export const login = async (userId, password) => {
  * @throws {Error} If logout fails
  */
 export const logout = async () => {
-  try {
-    const response = await apiClient.post('/api/auth/logout');
+  // If using real API:
+  // await apiClient.post('/api/auth/logout');
 
-    // Clear authentication data from localStorage
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_data');
+  console.log('👋 Logged out successfully');
 
-    return response;
-  } catch (error) {
-    throw new Error(error.message || 'Logout failed');
-  }
+  // Clear authentication data from localStorage
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user_role');
+  localStorage.removeItem('user_data');
+
+  return { success: true };
 };
 
 /**
@@ -52,15 +139,11 @@ export const logout = async () => {
  * @throws {Error} If registration fails
  */
 export const register = async (userData) => {
-  try {
-    const response = await apiClient.post('/api/auth/register', {
-      ...userData,
-      role: 'student', // Self-registration is only for students
-    });
-    return response;
-  } catch (error) {
-    throw new Error(error.message || 'Registration failed');
-  }
+  const response = await apiClient.post('/api/auth/register', {
+    ...userData,
+    role: 'student', // Self-registration is only for students
+  });
+  return response;
 };
 
 /**
@@ -70,14 +153,18 @@ export const register = async (userData) => {
  * @throws {Error} If password reset request fails
  */
 export const forgotPassword = async (email) => {
-  try {
-    const response = await apiClient.post('/api/auth/forgot-password', {
-      email,
-    });
-    return response;
-  } catch (error) {
-    throw new Error(error.message || 'Failed to send password reset email');
-  }
+  // Mock response
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log('📧 Password reset email sent to:', email);
+
+  return {
+    success: true,
+    message: 'Password reset link sent to your email',
+  };
+
+  // Real API:
+  // const response = await apiClient.post('/api/auth/forgot-password', { email });
+  // return response;
 };
 
 /**
@@ -87,14 +174,19 @@ export const forgotPassword = async (email) => {
  * @returns {Promise<Object>} Response confirming password reset
  * @throws {Error} If password reset fails
  */
-export const resetPassword = async (token, newPassword) => {
-  try {
-    const response = await apiClient.post('/api/auth/reset-password', {
-      token,
-      newPassword,
-    });
-    return response;
-  } catch (error) {
-    throw new Error(error.message || 'Password reset failed');
-  }
+export const resetPassword = async () => {
+  // Mock response
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return {
+    success: true,
+    message: 'Password reset successful',
+  };
+
+  // Real API example (keep for reference):
+  // const response = await apiClient.post('/api/auth/reset-password', {
+  //   token,
+  //   newPassword,
+  // });
+  // return response;
 };

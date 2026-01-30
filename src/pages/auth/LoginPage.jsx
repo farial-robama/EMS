@@ -45,39 +45,62 @@ const LoginPage = () => {
     clearErrors();
 
     try {
+      console.log('🎯 LoginPage: Form submitted with:', {
+        userId: data.userId,
+      });
+
       // Validate user ID format
       const userIdValidation = validateUserId(data.userId);
       if (!userIdValidation.isValid) {
+        console.warn(
+          '⚠️ LoginPage: Validation failed:',
+          userIdValidation.message
+        );
         setError('userId', { message: userIdValidation.message });
         setIsLoading(false);
         return;
       }
 
+      console.log('✓ LoginPage: User ID validation passed');
+
       // Call login function
       const response = await login(data.userId, data.password);
+
+      console.log('📊 LoginPage: Login response received:', response);
 
       // Show success message
       showSuccess('Login successful!');
 
-      // Redirect based on role
+      // Redirect based on role - FIX: Use correct role names
       const roleRoutes = {
         super_admin: '/super-admin/dashboard',
+        SUPER_ADMIN: '/super-admin/dashboard',
         admin: '/admin/dashboard',
+        ADMIN: '/admin/dashboard',
         student: '/student/dashboard',
+        STUDENT: '/student/dashboard',
         teacher: '/teacher/dashboard',
+        TEACHER: '/teacher/dashboard',
       };
 
       const userRole = response.user?.role || 'student';
+
+      console.log('👤 LoginPage: User role:', userRole);
+
       const dashboardRoute = roleRoutes[userRole] || '/dashboard';
+
+      console.log('🚀 LoginPage: Redirecting to:', dashboardRoute);
 
       navigate(dashboardRoute, { replace: true });
     } catch (error) {
+      console.error('❌ LoginPage: Login failed:', error);
+
       // Show error message
       const errorMessage = error.message || 'Login failed. Please try again.';
       showError(errorMessage);
 
       // Clear password field on error
-      reset({ ...data, password: '' });
+      reset({ userId: data.userId, password: '' });
     } finally {
       setIsLoading(false);
     }
