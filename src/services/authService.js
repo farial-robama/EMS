@@ -42,6 +42,28 @@ export const logout = async () => {
 };
 
 /**
+ * Registers a new student user
+ * @param {Object} userData - User registration data
+ * @param {string} userData.fullName - User's full name
+ * @param {string} userData.email - User's email address
+ * @param {string} userData.phone - User's phone number
+ * @param {string} userData.password - User's password
+ * @returns {Promise<Object>} Response containing user data
+ * @throws {Error} If registration fails
+ */
+export const register = async (userData) => {
+  try {
+    const response = await apiClient.post('/api/auth/register', {
+      ...userData,
+      role: 'student', // Self-registration is only for students
+    });
+    return response;
+  } catch (error) {
+    throw new Error(error.message || 'Registration failed');
+  }
+};
+
+/**
  * Initiates password reset process by sending reset email
  * @param {string} email - The user's email address
  * @returns {Promise<Object>} Response confirming email sent
