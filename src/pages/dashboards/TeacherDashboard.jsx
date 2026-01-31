@@ -60,14 +60,14 @@ const TeacherDashboard = () => {
       <div className="p-6">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-semibold text-amber-800">
+            <h1 className="text-3xl font-semibold text-amber-800 dark:text-amber-200">
               {greeting}, {user?.name || 'Teacher'}
             </h1>
             <div className="mt-2 flex items-center gap-3">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200">
                 TEACHER
               </span>
-              <time className="text-sm text-gray-500">
+              <time className="text-sm text-gray-500 dark:text-gray-400">
                 {now.toLocaleString()}
               </time>
             </div>
@@ -83,10 +83,10 @@ const TeacherDashboard = () => {
                     <s.icon size={20} />
                   </div>
                   <div>
-                    <div className="text-2xl font-semibold text-gray-900">
+                    <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {s.value}
                     </div>
-                    <div className="text-sm text-gray-500">{s.label}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{s.label}</div>
                   </div>
                 </div>
               </Card>
@@ -95,14 +95,14 @@ const TeacherDashboard = () => {
         </section>
 
         <section className="mb-6">
-          <h2 className="text-lg font-medium text-gray-800 mb-3">
+            <h2 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-3">
             Quick Actions
           </h2>
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
             {actions.map((a) => (
               <button
                 key={a.id}
-                className="flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-amber-50 border hover:border-amber-100 transition"
+                className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-amber-50 dark:hover:bg-amber-700 border dark:border-gray-700 hover:border-amber-100 transition"
               >
                 <div className="p-2 rounded-md bg-amber-100 text-amber-700">
                   <a.icon size={18} />
@@ -121,7 +121,7 @@ const TeacherDashboard = () => {
             {recent.map((r) => (
               <div
                 key={r.id}
-                className="flex items-start gap-3 p-3 rounded-md bg-white border"
+                className="flex items-start gap-3 p-3 rounded-md bg-white dark:bg-gray-800 border dark:border-gray-700"
               >
                 <div className="p-2 rounded-md bg-amber-50 text-amber-600">
                   <r.icon size={18} />

@@ -107,7 +107,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:px-8 lg:py-12 bg-gradient-to-br from-blue-600 to-blue-800">
         <div className="mx-auto w-full max-w-md">
@@ -136,10 +136,10 @@ const LoginPage = () => {
         <div className="mx-auto w-full max-w-md">
           {/* Mobile Branding */}
           <div className="lg:hidden text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Advance IT Solutions
             </h1>
-            <p className="text-gray-600">Educational Management System</p>
+            <p className="text-gray-600 dark:text-gray-400">Educational Management System</p>
           </div>
 
           {/* Login Card */}
@@ -189,7 +189,7 @@ const LoginPage = () => {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900"
+                  className="ml-2 block text-sm text-gray-900 dark:text-gray-200"
                 >
                   Remember me
                 </label>
@@ -220,7 +220,7 @@ const LoginPage = () => {
           </Card>
 
           {/* Footer */}
-          <div className="mt-8 text-center text-sm text-gray-600">
+          <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
             <p>&copy; 2026 Advance IT Solutions. All rights reserved.</p>
           </div>
         </div>

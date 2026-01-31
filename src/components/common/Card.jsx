@@ -19,9 +19,9 @@ const Card = ({
     lg: 'p-8',
   };
 
-  // Base card classes
+  // Base card classes with dark mode support and transitions
   const cardClasses = `
-    bg-white shadow-md rounded-lg border border-gray-200
+    bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300
     ${className}
   `;
 
@@ -29,12 +29,12 @@ const Card = ({
     <div className={cardClasses}>
       {/* Header Section */}
       {title && (
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
               {subtitle && (
-                <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{subtitle}</p>
               )}
             </div>
             {headerAction && (

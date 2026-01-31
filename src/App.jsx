@@ -18,8 +18,6 @@ import routes from './routes/routes';
 import { Suspense } from 'react';
 import LoadingSpinner from './components/common/LoadingSpinner';
 
-
-
 // Route Guard Component for authenticated users
 const AuthenticatedRoute = ({ children }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
@@ -56,7 +54,9 @@ const AuthenticatedRoute = ({ children }) => {
 const AppRoutes = () => {
   // Page wrapper adds title and breadcrumbs
   const PageWrapper = ({ meta, children }) => {
-    const title = meta?.title ? `${meta.title} • Educational Management System` : 'Educational Management System';
+    const title = meta?.title
+      ? `${meta.title} • Educational Management System`
+      : 'Educational Management System';
 
     useEffect(() => {
       document.title = title;
@@ -124,7 +124,13 @@ const AppRoutes = () => {
             key={r.path}
             path={r.path}
             element={
-              <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>}>
+              <Suspense
+                fallback={
+                  <div className="min-h-screen flex items-center justify-center">
+                    <LoadingSpinner />
+                  </div>
+                }
+              >
                 {pageElement}
               </Suspense>
             }

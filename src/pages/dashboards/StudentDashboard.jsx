@@ -49,14 +49,14 @@ const StudentDashboard = () => {
       <div className="p-6">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-semibold text-sky-800">
+            <h1 className="text-3xl font-semibold text-sky-800 dark:text-sky-200">
               {greeting}, {user?.name || 'Student'}
             </h1>
             <div className="mt-2 flex items-center gap-3">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-sky-100 text-sky-800">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-sky-100 dark:bg-sky-900/20 text-sky-800 dark:text-sky-200">
                 STUDENT
               </span>
-              <time className="text-sm text-gray-500">
+              <time className="text-sm text-gray-500 dark:text-gray-400">
                 {now.toLocaleString()}
               </time>
             </div>
@@ -72,10 +72,10 @@ const StudentDashboard = () => {
                     <s.icon size={20} />
                   </div>
                   <div>
-                    <div className="text-2xl font-semibold text-gray-900">
+                    <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {s.value}
                     </div>
-                    <div className="text-sm text-gray-500">{s.label}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{s.label}</div>
                   </div>
                 </div>
               </Card>
@@ -91,7 +91,7 @@ const StudentDashboard = () => {
             {actions.map((a) => (
               <button
                 key={a.id}
-                className="flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-sky-50 border hover:border-sky-100 transition"
+                className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-sky-50 dark:hover:bg-sky-700 border dark:border-gray-700 hover:border-sky-100 transition"
               >
                 <div className="p-2 rounded-md bg-sky-100 text-sky-700">
                   <a.icon size={18} />
@@ -110,7 +110,7 @@ const StudentDashboard = () => {
             {recent.map((r) => (
               <div
                 key={r.id}
-                className="flex items-start gap-3 p-3 rounded-md bg-white border"
+                className="flex items-start gap-3 p-3 rounded-md bg-white dark:bg-gray-800 border dark:border-gray-700"
               >
                 <div className="p-2 rounded-md bg-sky-50 text-sky-600">
                   <r.icon size={18} />

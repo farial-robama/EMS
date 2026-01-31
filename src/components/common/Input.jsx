@@ -28,14 +28,14 @@ const Input = forwardRef(
     // Determine input type based on password toggle
     const inputType = type === 'password' && showPassword ? 'text' : type;
 
-    // Base input classes
+    // Base input classes with dark mode
     const baseClasses = `
     w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400
     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
     transition duration-200 ease-in-out
     ${Icon ? 'pl-10' : ''}
-    ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300'}
-    ${disabled ? 'bg-gray-100 cursor-not-allowed text-gray-500' : 'bg-white'}
+    ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}
+    ${disabled ? 'bg-gray-100 cursor-not-allowed text-gray-500 dark:bg-gray-700 dark:text-gray-400' : 'bg-white dark:bg-gray-700 dark:text-white'}
   `;
 
     return (
@@ -43,7 +43,7 @@ const Input = forwardRef(
         {/* Label */}
         <label
           htmlFor={name}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -54,7 +54,7 @@ const Input = forwardRef(
           {/* Icon */}
           {Icon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Icon className="h-5 w-5 text-gray-400" />
+              <Icon className="h-5 w-5 text-gray-400 dark:text-gray-300" />
             </div>
           )}
 

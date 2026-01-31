@@ -134,19 +134,20 @@ const SuperAdminDashboard = () => {
       value: dashboardData?.stats.totalUsers || 0,
       icon: Users,
       color: 'blue',
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
       iconColor: 'text-blue-600',
       trend: '+12%',
       trendUp: true,
       description: 'from last month',
     },
+
     {
       id: 'total-students',
       title: 'Total Students',
       value: dashboardData?.stats.totalStudents || 0,
       icon: GraduationCap,
       color: 'green',
-      bgColor: 'bg-green-50',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
       iconColor: 'text-green-600',
       trend: '+8%',
       trendUp: true,
@@ -158,7 +159,7 @@ const SuperAdminDashboard = () => {
       value: dashboardData?.stats.totalTeachers || 0,
       icon: UserCheck,
       color: 'purple',
-      bgColor: 'bg-purple-50',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
       iconColor: 'text-purple-600',
       trend: '+5%',
       trendUp: true,
@@ -170,7 +171,7 @@ const SuperAdminDashboard = () => {
       value: `৳${(dashboardData?.stats.monthlyRevenue || 0).toLocaleString()}`,
       icon: DollarSign,
       color: 'yellow',
-      bgColor: 'bg-yellow-50',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
       iconColor: 'text-yellow-600',
       trend: '+15%',
       trendUp: true,
@@ -218,11 +219,11 @@ const SuperAdminDashboard = () => {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="h-10 w-64 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-10 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           <CardSkeleton count={4} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
-            <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
           </div>
         </div>
       </DashboardLayout>
