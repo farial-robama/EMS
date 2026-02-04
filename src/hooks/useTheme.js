@@ -115,3 +115,86 @@ export default function useTheme() {
     setDarkMode,
   };
 }
+// src/hooks/useTheme.js
+import { useState, useEffect } from 'react';
+
+const useTheme = () => {
+  // Initialize dark mode from localStorage or system preference
+  const [darkMode, setDarkMode] = useState(() => {
+    // Check localStorage first
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    
+    // Fall back to system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return true;
+    }
+    
+    // Default to light mode
+    return false;
+  });
+
+  // Apply theme to document on mount and when darkMode changes
+  useEffect(() => {
+    const applyTheme = (isDark) => {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    };
+
+    applyTheme(darkMode);
+  }, [darkMode]);
+
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = (e) => {
+      // Only update if no user preference is saved
+      const savedTheme = localStorage.getItem('theme');
+      if (!savedTheme) {
+        setDarkMode(e.matches);
+      }
+    };
+
+    // Modern browsers
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } 
+    // Legacy browsers
+    else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setDarkMode((prev) => !prev);
+  };
+
+  const setTheme = (theme) => {
+    if (theme === 'dark') {
+      setDarkMode(true);
+    } else if (theme === 'light') {
+      setDarkMode(false);
+    }
+  };
+
+  return {
+    darkMode,
+    toggleTheme,
+    setDarkMode,
+    setTheme,
+  };
+};
+
+export default useTheme;
