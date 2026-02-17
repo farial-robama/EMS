@@ -3,8 +3,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  login as authLogin,
-  logout as authLogout,
+  loginUser as authLogin,
+  logoutUser as authLogout,
 } from '../services/authService';
 
 // Create the AuthContext
@@ -28,49 +28,109 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Login function
-  const login = async (userId, password) => {
-    try {
-      console.log('📝 AuthContext: Starting login...');
-      const response = await authLogin(userId, password);
 
-      console.log('📥 AuthContext: Received response:', response);
 
-      // FIX: Handle both mock and real API response structures
-      // Mock response: { token, user, success }
-      // Real API response: { data: { token, user }, success }
-      const userData = response.user || response.data?.user;
-      const authToken = response.token || response.data?.token;
+  // ✅ ADD THIS - Log every state change
+  useEffect(() => {
+    console.log('📊 AuthContext STATE CHANGED:', {
+      isAuthenticated,
+      hasUser: !!user,
+      userRole: user?.role,
+      hasToken: !!token
+    });
+  }, [isAuthenticated, user, token]);
 
-      console.log('🔍 AuthContext: Extracted userData:', userData);
-      console.log('🔍 AuthContext: Extracted token:', authToken);
 
-      if (!userData || !authToken) {
-        console.error('❌ AuthContext: Invalid response structure:', response);
-        throw new Error('Invalid response: missing user or token');
-      }
 
-      // Update state
-      setUser(userData);
-      setToken(authToken);
-      setIsAuthenticated(true);
 
-      console.log('✅ AuthContext: State updated successfully');
-      console.log('👤 AuthContext: User role:', userData.role);
 
-      // Save to localStorage
-      localStorage.setItem('auth_token', authToken);
-      localStorage.setItem('user_data', JSON.stringify(userData));
 
-      console.log('💾 AuthContext: Saved to localStorage');
-
-      // Return the response for LoginPage to use
-      return { user: userData, token: authToken, success: true };
-    } catch (error) {
-      console.error('❌ AuthContext Login Error:', error);
-      throw error;
+  // Update localStorage whenever user changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user_data', JSON.stringify(user));
     }
-  };
+  }, [user]);
+
+  // Login function
+//   const login = async (userId, password) => {
+//   try {
+//     const response = await authLogin({ userId, password });
+
+//     // response is already data
+//     const userData = response.user;
+//     const authToken = response.accessToken; // or response.token depending on backend
+
+//     if (!userData || !authToken) {
+//       throw new Error('Invalid response: missing user or token');
+//     }
+
+//     // Update state
+//     setUser(userData);
+//     setToken(authToken);
+//     setIsAuthenticated(true);
+
+//     // Save to localStorage
+//     localStorage.setItem('auth_token', authToken);
+//     localStorage.setItem('user_data', JSON.stringify(userData));
+//     localStorage.setItem('user_role', userData.role);
+
+//     console.log('✅ AuthContext: Login successful', userData);
+
+//     return { user: userData, token: authToken, success: true };
+//   } catch (error) {
+//     console.error('❌ AuthContext Login Error:', error);
+//     throw error;
+//   }
+// };
+
+
+// Login function
+const login = async (userId, password) => {
+  try {
+    console.log('🔐 AuthContext: Starting login...', { userId });
+    const response = await authLogin({ userId, password });
+
+    console.log('📦 AuthContext: Login response:', response);
+
+    // ✅ FIX: Backend wraps everything in a 'data' object
+    
+    const userData = response.user;
+const authToken = response.accessToken;
+
+    console.log('👤 AuthContext: User data:', userData);
+    console.log('🔑 AuthContext: Token:', authToken);
+
+    if (!userData || !authToken) {
+      console.error('❌ Missing data:', { userData, authToken, fullResponse: response });
+      throw new Error('Invalid response: missing user or token');
+    }
+
+    // Update state
+    setUser(userData);
+    setToken(authToken);
+    setIsAuthenticated(true);
+
+    console.log('✅ AuthContext: State updated');
+    console.log('   - isAuthenticated:', true);
+    console.log('   - user:', userData);
+    console.log('   - user.role:', userData.role);
+
+    // Save to localStorage
+    localStorage.setItem('auth_token', authToken);
+    localStorage.setItem('user_data', JSON.stringify(userData));
+    localStorage.setItem('user_role', userData.role);
+
+    console.log('💾 AuthContext: Saved to localStorage');
+    console.log('✅ AuthContext: Login successful', userData);
+
+    return { user: userData, token: authToken, success: true };
+  } catch (error) {
+    console.error('❌ AuthContext Login Error:', error);
+    throw error;
+  }
+};
+
 
   // Logout function
   const logout = async () => {
@@ -102,6 +162,69 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Update user profile function
+  const updateUserProfile = (updatedData) => {
+    console.log('🔄 AuthContext: Updating user profile...');
+    console.log('📝 AuthContext: Updated data:', updatedData);
+    
+    setUser(prevUser => {
+      const newUser = {
+        ...prevUser,
+        ...updatedData
+      };
+      console.log('✅ AuthContext: User updated to:', newUser);
+      return newUser;
+    });
+  };
+
+  // Update profile image function
+  const updateProfileImage = (imageUrl) => {
+    console.log('🖼️ AuthContext: Updating profile image:', imageUrl);
+    
+    setUser(prevUser => ({
+      ...prevUser,
+      profileImage: imageUrl
+    }));
+  };
+
+  // Refresh user data from API
+  const refreshUserData = async () => {
+    try {
+      if (!user || !user._id || !token) {
+        console.warn('⚠️ Cannot refresh user data: missing user ID or token');
+        return;
+      }
+
+      console.log('🔄 AuthContext: Refreshing user data from API...');
+      
+      // Call your API to get updated user data
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/${user._id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const result = await response.json();
+      const updatedUser = result.data;
+
+      console.log('✅ AuthContext: User data refreshed:', updatedUser);
+      
+      setUser(updatedUser);
+      localStorage.setItem('user_data', JSON.stringify(updatedUser));
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('❌ AuthContext: Error refreshing user data:', error);
+      throw error;
+    }
+  };
+
   // Check authentication status on app load
   const checkAuth = () => {
     try {
@@ -113,6 +236,9 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
         setToken(storedToken);
         setIsAuthenticated(true);
+        
+        console.log('✅ AuthContext: Restored auth from localStorage');
+        console.log('👤 AuthContext: User:', userData);
       }
     } catch (error) {
       // If there's an error parsing stored data, clear it
@@ -146,6 +272,10 @@ export const AuthProvider = ({ children }) => {
     logout,
     checkAuth,
     hasRole,
+    updateUserProfile,
+    updateProfileImage,
+    refreshUserData,
+    setUser, // For manual updates if needed
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

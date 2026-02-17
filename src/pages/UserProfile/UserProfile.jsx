@@ -26,7 +26,7 @@ import {
 import { toast } from 'react-toastify';
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, token, updateUserProfile, updateProfileImage, refreshUserData } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
@@ -35,48 +35,61 @@ const UserProfile = () => {
   // Form states
   const [editForm, setEditForm] = useState({});
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
+    oldPassword: '',
     newPassword: '',
-    confirmPassword: '',
   });
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // API Base URL
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Initialize edit form with user data
   useEffect(() => {
     if (user) {
       setEditForm({
-        name: user.name || '',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
         email: user.email || '',
         phone: user.phone || '',
-        smsContact: user.smsContact || user.phone || '',
-        guardianPhone: user.guardianPhone || '',
-        address: user.address || '',
-        dateOfBirth: user.dateOfBirth || '',
-        nationality: user.nationality || 'BANGLADESH',
-        gender: user.gender || '',
-        // Student specific
-        fatherName: user.fatherName || '',
-        motherName: user.motherName || '',
-        studentRoll: user.studentRoll || '',
-        programSession: user.programSession || '',
-        // Teacher/Admin specific
-        employeeId: user.employeeId || '',
-        department: user.department || '',
-        designation: user.designation || '',
-        joiningDate: user.joiningDate || '',
-        qualification: user.qualification || '',
-        specialization: user.specialization || '',
-        experience: user.experience || '',
+        bio: user.bio || '',
+        location: user.location || '',
       });
       setImagePreview(user.profileImage || null);
     }
   }, [user]);
 
-  // Handle image upload
+  // Handle image upload to Cloudinary
+  const uploadImageToCloudinary = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'your_upload_preset'); // Replace with your Cloudinary upload preset
+      formData.append('folder', 'profile_images');
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/your_cloud_name/image/upload`, // Replace with your Cloudinary cloud name
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
+  // Handle image change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -116,7 +129,8 @@ const UserProfile = () => {
   const validateEditForm = () => {
     const newErrors = {};
     
-    if (!editForm.name?.trim()) newErrors.name = 'Name is required';
+    if (!editForm.firstName?.trim()) newErrors.firstName = 'First name is required';
+    if (!editForm.lastName?.trim()) newErrors.lastName = 'Last name is required';
     if (!editForm.email?.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(editForm.email)) {
@@ -134,16 +148,13 @@ const UserProfile = () => {
   const validatePasswordForm = () => {
     const newErrors = {};
     
-    if (!passwordForm.currentPassword) {
-      newErrors.currentPassword = 'Current password is required';
+    if (!passwordForm.oldPassword) {
+      newErrors.oldPassword = 'Current password is required';
     }
     if (!passwordForm.newPassword) {
       newErrors.newPassword = 'New password is required';
     } else if (passwordForm.newPassword.length < 6) {
       newErrors.newPassword = 'Password must be at least 6 characters';
-    }
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
     }
     
     setErrors(newErrors);
@@ -159,25 +170,68 @@ const UserProfile = () => {
     setLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      let profileImageUrl = user.profileImage;
+
+      // Upload image to Cloudinary if a new image is selected
+      if (profileImage) {
+        toast.info('Uploading image...');
+        // For now, we'll use the preview URL. Replace this with actual Cloudinary upload
+        // profileImageUrl = await uploadImageToCloudinary(profileImage);
+        
+        // Temporary: Use base64 preview (replace with Cloudinary in production)
+        profileImageUrl = imagePreview;
+      }
+
+      // Prepare updated data matching API structure
+      const updatedData = {
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        email: editForm.email,
+        phone: editForm.phone,
+        bio: editForm.bio,
+        location: editForm.location,
+        profileImage: profileImageUrl,
+      };
+
+      // Note: Based on your API docs, there's no update profile endpoint shown
+      // You'll need to add this endpoint to your backend
+      // For now, we'll update locally and optionally call the API when ready
       
-      // Here you would make an actual API call
-      // const formData = new FormData();
-      // Object.keys(editForm).forEach(key => {
-      //   formData.append(key, editForm[key]);
-      // });
-      // if (profileImage) {
-      //   formData.append('profileImage', profileImage);
-      // }
-      // await updateUserProfile(formData);
+      // Uncomment when you have the update profile API endpoint
+      /*
+      const response = await fetch(`${API_BASE_URL}/user/${user._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const result = await response.json();
+      */
+
+      // Update local state immediately (optimistic update)
+      updateUserProfile(updatedData);
       
+      if (profileImageUrl !== user.profileImage) {
+        updateProfileImage(profileImageUrl);
+      }
+
       toast.success('Profile updated successfully!');
       setShowEditModal(false);
       setProfileImage(null);
+      
+      // Optionally refresh from server to ensure sync
+      // await refreshUserData();
+      
     } catch (error) {
-      toast.error('Failed to update profile. Please try again.');
-      console.error(error);
+      toast.error(error.message || 'Failed to update profile. Please try again.');
+      console.error('Profile update error:', error);
     } finally {
       setLoading(false);
     }
@@ -192,415 +246,53 @@ const UserProfile = () => {
     setLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Here you would make an actual API call
-      // await changePassword({
-      //   currentPassword: passwordForm.currentPassword,
-      //   newPassword: passwordForm.newPassword,
-      // });
-      
+      // Call the change password API
+      const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          oldPassword: passwordForm.oldPassword,
+          newPassword: passwordForm.newPassword,
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to change password');
+      }
+
       toast.success('Password changed successfully!');
       setShowPasswordModal(false);
       setPasswordForm({
-        currentPassword: '',
+        oldPassword: '',
         newPassword: '',
-        confirmPassword: '',
       });
+      
     } catch (error) {
-      toast.error('Failed to change password. Please try again.');
-      console.error(error);
+      toast.error(error.message || 'Failed to change password. Please try again.');
+      console.error('Password change error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Render profile fields based on role
-  const renderProfileFields = () => {
-    const role = user?.role?.toUpperCase();
-    
-    const commonFields = [
-      { label: 'Full Name', value: user?.name, icon: User },
-      { label: 'Email', value: user?.email, icon: Mail },
-      { label: 'Phone', value: user?.phone, icon: Phone },
-      { label: 'Gender', value: user?.gender, icon: UserCircle },
-      { label: 'Date of Birth', value: user?.dateOfBirth, icon: Calendar },
-      { label: 'Nationality', value: user?.nationality, icon: Globe },
-      { label: 'Address', value: user?.address, icon: Home },
-    ];
-
-    if (role === 'STUDENT') {
-      return [
-        { label: 'Full Name', value: user?.name, icon: User },
-        { label: "Father's Name", value: user?.fatherName, icon: Users },
-        { label: "Mother's Name", value: user?.motherName, icon: Users },
-        { label: 'Student Roll', value: user?.studentRoll, icon: IdCard },
-        { label: 'Program Session', value: user?.programSession, icon: GraduationCap },
-        { label: 'Date of Birth', value: user?.dateOfBirth, icon: Calendar },
-        { label: 'Nationality', value: user?.nationality, icon: Globe },
-        { label: 'Gender', value: user?.gender, icon: UserCircle },
-        { label: 'Phone', value: user?.phone, icon: Phone },
-        { label: 'SMS Contact No', value: user?.smsContact || user?.phone, icon: Phone },
-        { label: 'Guardian Phone', value: user?.guardianPhone, icon: Phone },
-        { label: 'Email', value: user?.email, icon: Mail },
-        { label: 'Address', value: user?.address, icon: Home },
-      ];
-    }
-
-    if (role === 'TEACHER') {
-      return [
-        { label: 'Full Name', value: user?.name, icon: User },
-        { label: 'Employee ID', value: user?.employeeId, icon: IdCard },
-        { label: 'Department', value: user?.department, icon: Briefcase },
-        { label: 'Designation', value: user?.designation, icon: Briefcase },
-        { label: 'Email', value: user?.email, icon: Mail },
-        { label: 'Phone', value: user?.phone, icon: Phone },
-        { label: 'Date of Birth', value: user?.dateOfBirth, icon: Calendar },
-        { label: 'Gender', value: user?.gender, icon: UserCircle },
-        { label: 'Joining Date', value: user?.joiningDate, icon: Calendar },
-        { label: 'Qualification', value: user?.qualification, icon: GraduationCap },
-        { label: 'Specialization', value: user?.specialization, icon: GraduationCap },
-        { label: 'Experience', value: user?.experience, icon: Briefcase },
-        { label: 'Nationality', value: user?.nationality, icon: Globe },
-        { label: 'Address', value: user?.address, icon: Home },
-      ];
-    }
-
-    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-      return [
-        { label: 'Full Name', value: user?.name, icon: User },
-        { label: 'Employee ID', value: user?.employeeId, icon: IdCard },
-        { label: 'Role', value: user?.role?.replace('_', ' '), icon: Shield },
-        { label: 'Department', value: user?.department, icon: Briefcase },
-        { label: 'Designation', value: user?.designation, icon: Briefcase },
-        { label: 'Email', value: user?.email, icon: Mail },
-        { label: 'Phone', value: user?.phone, icon: Phone },
-        { label: 'Date of Birth', value: user?.dateOfBirth, icon: Calendar },
-        { label: 'Gender', value: user?.gender, icon: UserCircle },
-        { label: 'Joining Date', value: user?.joiningDate, icon: Calendar },
-        { label: 'Nationality', value: user?.nationality, icon: Globe },
-        { label: 'Address', value: user?.address, icon: Home },
-      ];
-    }
-
-    return commonFields;
-  };
-
-  // Render edit form fields based on role
-  const renderEditFormFields = () => {
-    const role = user?.role?.toUpperCase();
-
-    return (
-      <div className="space-y-4">
-        {/* Common Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={editForm.name || ''}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email *
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={editForm.email || ''}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Phone
-            </label>
-            <input
-              type="text"
-              name="phone"
-              value={editForm.phone || ''}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Gender
-            </label>
-            <select
-              name="gender"
-              value={editForm.gender || ''}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Date of Birth
-            </label>
-            <input
-              type="date"
-              name="dateOfBirth"
-              value={editForm.dateOfBirth || ''}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nationality
-            </label>
-            <input
-              type="text"
-              name="nationality"
-              value={editForm.nationality || ''}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Address
-          </label>
-          <textarea
-            name="address"
-            value={editForm.address || ''}
-            onChange={handleInputChange}
-            rows="2"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-
-        {/* Student Specific Fields */}
-        {role === 'STUDENT' && (
-          <>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                Student Information
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Father's Name
-                  </label>
-                  <input
-                    type="text"
-                    name="fatherName"
-                    value={editForm.fatherName || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Mother's Name
-                  </label>
-                  <input
-                    type="text"
-                    name="motherName"
-                    value={editForm.motherName || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Student Roll
-                  </label>
-                  <input
-                    type="text"
-                    name="studentRoll"
-                    value={editForm.studentRoll || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Program Session
-                  </label>
-                  <input
-                    type="text"
-                    name="programSession"
-                    value={editForm.programSession || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    SMS Contact No
-                  </label>
-                  <input
-                    type="text"
-                    name="smsContact"
-                    value={editForm.smsContact || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Guardian Phone
-                  </label>
-                  <input
-                    type="text"
-                    name="guardianPhone"
-                    value={editForm.guardianPhone || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Teacher/Admin Specific Fields */}
-        {(role === 'TEACHER' || role === 'ADMIN' || role === 'SUPER_ADMIN') && (
-          <>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                Professional Information
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Employee ID
-                  </label>
-                  <input
-                    type="text"
-                    name="employeeId"
-                    value={editForm.employeeId || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Department
-                  </label>
-                  <input
-                    type="text"
-                    name="department"
-                    value={editForm.department || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Designation
-                  </label>
-                  <input
-                    type="text"
-                    name="designation"
-                    value={editForm.designation || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Joining Date
-                  </label>
-                  <input
-                    type="date"
-                    name="joiningDate"
-                    value={editForm.joiningDate || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                {role === 'TEACHER' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Qualification
-                      </label>
-                      <input
-                        type="text"
-                        name="qualification"
-                        value={editForm.qualification || ''}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Specialization
-                      </label>
-                      <input
-                        type="text"
-                        name="specialization"
-                        value={editForm.specialization || ''}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Experience (Years)
-                      </label>
-                      <input
-                        type="text"
-                        name="experience"
-                        value={editForm.experience || ''}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    );
-  };
-
-  const profileFields = renderProfileFields();
+  // Render profile fields
+  const profileFields = [
+    { label: 'First Name', value: user?.firstName, icon: User },
+    { label: 'Last Name', value: user?.lastName, icon: User },
+    { label: 'User ID', value: user?.userId, icon: IdCard },
+    { label: 'Email', value: user?.email, icon: Mail },
+    { label: 'Phone', value: user?.phone, icon: Phone },
+    { label: 'Role', value: user?.role?.toUpperCase(), icon: Shield },
+    { label: 'Bio', value: user?.bio, icon: UserCircle },
+    { label: 'Location', value: user?.location, icon: MapPin },
+    { label: 'Verified', value: user?.verified ? 'Yes' : 'No', icon: Shield },
+    { label: 'Joined', value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A', icon: Calendar },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-8">
@@ -618,10 +310,14 @@ const UserProfile = () => {
             <div className="flex flex-col md:flex-row items-center md:items-end gap-4 -mt-16 md:-mt-20">
               <div className="relative">
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white text-4xl md:text-5xl font-bold shadow-2xl overflow-hidden">
-                  {imagePreview ? (
-                    <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                  {imagePreview || user?.profileImage ? (
+                    <img 
+                      src={imagePreview || user?.profileImage} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover" 
+                    />
                   ) : (
-                    user?.name?.charAt(0).toUpperCase()
+                    user?.firstName?.charAt(0).toUpperCase()
                   )}
                 </div>
                 <div className="absolute bottom-0 right-0 bg-green-500 w-6 h-6 rounded-full border-2 border-white dark:border-gray-800"></div>
@@ -629,29 +325,28 @@ const UserProfile = () => {
 
               <div className="flex-1 text-center md:text-left mb-2">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                  {user?.name}
+                  {user?.firstName} {user?.lastName}
                 </h1>
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
                   <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium rounded-full">
                     <Shield className="w-3 h-3" />
-                    {user?.role?.replace('_', ' ')}
+                    {user?.role?.toUpperCase()}
                   </span>
-                  {user?.employeeId && (
+                  {user?.userId && (
                     <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-full">
                       <IdCard className="w-3 h-3" />
-                      {user.employeeId}
+                      {user.userId}
                     </span>
                   )}
-                  {user?.studentRoll && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-full">
-                      <IdCard className="w-3 h-3" />
-                      Roll: {user.studentRoll}
+                  {user?.verified && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
+                      ✓ Verified
                     </span>
                   )}
                 </div>
-                {user?.department && (
+                {user?.bio && (
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    {user.designation} • {user.department}
+                    {user.bio}
                   </p>
                 )}
               </div>
@@ -711,7 +406,7 @@ const UserProfile = () => {
       {/* Edit Profile Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h3>
@@ -733,7 +428,7 @@ const UserProfile = () => {
                       {imagePreview ? (
                         <img src={imagePreview} alt="Profile Preview" className="w-full h-full object-cover" />
                       ) : (
-                        user?.name?.charAt(0).toUpperCase()
+                        user?.firstName?.charAt(0).toUpperCase()
                       )}
                     </div>
                     <label
@@ -756,7 +451,101 @@ const UserProfile = () => {
                 </div>
 
                 {/* Form Fields */}
-                {renderEditFormFields()}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={editForm.firstName || ''}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                          errors.firstName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={editForm.lastName || ''}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                          errors.lastName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={editForm.email || ''}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                          errors.email ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Phone
+                      </label>
+                      <input
+                        type="text"
+                        name="phone"
+                        value={editForm.phone || ''}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                          errors.phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Bio
+                    </label>
+                    <textarea
+                      name="bio"
+                      value={editForm.bio || ''}
+                      onChange={handleInputChange}
+                      rows="3"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Tell us about yourself..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      name="location"
+                      value={editForm.location || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="e.g., Dhaka, Bangladesh"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Modal Footer */}
@@ -810,31 +599,31 @@ const UserProfile = () => {
             {/* Modal Body */}
             <form onSubmit={handleChangePassword}>
               <div className="p-6 space-y-4">
-                {/* Current Password */}
+                {/* Old Password */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Current Password *
                   </label>
                   <div className="relative">
                     <input
-                      type={showCurrentPassword ? 'text' : 'password'}
-                      name="currentPassword"
-                      value={passwordForm.currentPassword}
+                      type={showOldPassword ? 'text' : 'password'}
+                      name="oldPassword"
+                      value={passwordForm.oldPassword}
                       onChange={handlePasswordChange}
                       className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                        errors.currentPassword ? 'border-red-500' : 'border-gray-300'
+                        errors.oldPassword ? 'border-red-500' : 'border-gray-300'
                       }`}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() => setShowOldPassword(!showOldPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                     >
-                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.currentPassword && (
-                    <p className="text-red-500 text-xs mt-1">{errors.currentPassword}</p>
+                  {errors.oldPassword && (
+                    <p className="text-red-500 text-xs mt-1">{errors.oldPassword}</p>
                   )}
                 </div>
 
@@ -862,34 +651,6 @@ const UserProfile = () => {
                     </button>
                   </div>
                   {errors.newPassword && <p className="text-red-500 text-xs mt-1">{errors.newPassword}</p>}
-                </div>
-
-                {/* Confirm Password */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Confirm New Password *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      name="confirmPassword"
-                      value={passwordForm.confirmPassword}
-                      onChange={handlePasswordChange}
-                      className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                        errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
-                  )}
                 </div>
 
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">

@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Key, Lock, CheckCircle } from 'lucide-react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Key, Lock, CheckCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { resetPassword } from '../../services/authService';
 import { showSuccess, showError } from '../../utils/toast';
-import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 
@@ -40,14 +39,16 @@ const calculatePasswordStrength = (password) => {
 };
 
 const ResetPasswordPage = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
+
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(null);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
-
-  const token = searchParams.get('token');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -58,6 +59,14 @@ const ResetPasswordPage = () => {
   } = useForm();
 
   const newPassword = watch('newPassword');
+
+  // Redirect if no email
+  useEffect(() => {
+    if (!email) {
+      showError('Please complete email verification first');
+      navigate('/auth/forgot-password', { replace: true });
+    }
+  }, [email, navigate]);
 
   // Calculate password strength when newPassword changes
   useEffect(() => {
@@ -79,14 +88,6 @@ const ResetPasswordPage = () => {
     return () => clearTimeout(timer);
   }, [countdown, resetSuccess, navigate]);
 
-  // Check if token exists
-  useEffect(() => {
-    if (!token) {
-      showError('Invalid reset link. Please request a new password reset.');
-      navigate('/auth/forgot-password', { replace: true });
-    }
-  }, [token, navigate]);
-
   const onSubmit = async (data) => {
     if (data.newPassword !== data.confirmPassword) {
       setError('confirmPassword', {
@@ -98,46 +99,50 @@ const ResetPasswordPage = () => {
     setIsLoading(true);
 
     try {
-      await resetPassword(token, data.newPassword);
+      const response = await resetPassword(email, data.newPassword);
       showSuccess('Password reset successfully!');
       setResetSuccess(true);
-      setCountdown(2); // 2 seconds countdown
+      setCountdown(5); // 5 seconds countdown
     } catch (error) {
       showError(
-        error.message || 'Failed to reset password. The link may be expired.'
+        error.message || 'Failed to reset password. Please try again.'
       );
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (!email) {
+    return null;
+  }
+
   if (resetSuccess) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           {/* Success Card */}
           <Card className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Password Reset Successful!
             </h2>
 
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Your password has been successfully reset. You can now log in with
               your new password.
             </p>
 
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               Redirecting to login in {countdown} second
               {countdown !== 1 ? 's' : ''}...
             </p>
 
             <Link
               to="/auth/login"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
             >
               Go to Login Now
             </Link>
@@ -147,67 +152,99 @@ const ResetPasswordPage = () => {
     );
   }
 
-  if (!token) {
-    return null; // Will redirect in useEffect
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {/* Back Link */}
+        <div className="text-center mb-6">
+          <Link
+            to="/auth/verify-email"
+            state={{ email }}
+            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-500 transition duration-200"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Link>
+        </div>
+
         {/* Reset Password Card */}
-        <Card className="text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-            <Key className="h-6 w-6 text-blue-600" />
+        <Card>
+          <div className="text-center mb-6">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
+              <Key className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Reset Your Password
+            </h2>
+
+            <p className="text-gray-600 dark:text-gray-400">
+              Enter your new password below
+            </p>
           </div>
-
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Reset Your Password
-          </h2>
-
-          <p className="text-gray-600 mb-6">Enter your new password below</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* New Password Field */}
             <div>
-              <Input
-                label="New Password"
-                type="password"
-                name="newPassword"
-                placeholder="Enter new password"
-                icon={Lock}
-                showPasswordToggle
-                {...register('newPassword', {
-                  required: 'New password is required',
-                  minLength: {
-                    value: 8,
-                    message: 'Password must be at least 8 characters long',
-                  },
-                  validate: (value) => {
-                    const strength = calculatePasswordStrength(value);
-                    if (strength.score < 3) {
-                      return 'Password must contain uppercase, lowercase, number, and symbol';
-                    }
-                    return true;
-                  },
-                })}
-                error={errors.newPassword?.message}
-                disabled={isLoading}
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                New Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  {...register('newPassword', {
+                    required: 'New password is required',
+                    minLength: {
+                      value: 8,
+                      message: 'Password must be at least 8 characters long',
+                    },
+                    validate: (value) => {
+                      const strength = calculatePasswordStrength(value);
+                      if (strength.score < 3) {
+                        return 'Password must contain uppercase, lowercase, number, and symbol';
+                      }
+                      return true;
+                    },
+                  })}
+                  disabled={isLoading}
+                  placeholder="Enter new password"
+                  className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+              {errors.newPassword && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.newPassword.message}
+                </p>
+              )}
 
               {/* Password Strength Indicator */}
               {passwordStrength && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       Password strength:
                     </span>
                     <span
                       className={`text-xs font-medium ${
                         passwordStrength.strength === 'strong'
-                          ? 'text-green-600'
+                          ? 'text-green-600 dark:text-green-400'
                           : passwordStrength.strength === 'medium'
-                            ? 'text-yellow-600'
-                            : 'text-red-600'
+                            ? 'text-yellow-600 dark:text-yellow-400'
+                            : 'text-red-600 dark:text-red-400'
                       }`}
                     >
                       {passwordStrength.strength.charAt(0).toUpperCase() +
@@ -224,23 +261,68 @@ const ResetPasswordPage = () => {
                       }}
                     ></div>
                   </div>
+                  
+                  {/* Password Requirements */}
+                  <div className="mt-2 space-y-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Password must contain:</p>
+                    <div className="grid grid-cols-2 gap-1 text-xs">
+                      <div className={passwordStrength.checks.length ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}>
+                        ✓ 8+ characters
+                      </div>
+                      <div className={passwordStrength.checks.uppercase ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}>
+                        ✓ Uppercase letter
+                      </div>
+                      <div className={passwordStrength.checks.lowercase ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}>
+                        ✓ Lowercase letter
+                      </div>
+                      <div className={passwordStrength.checks.number ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}>
+                        ✓ Number
+                      </div>
+                      <div className={passwordStrength.checks.symbol ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}>
+                        ✓ Special character
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Confirm Password Field */}
-            <Input
-              label="Confirm Password"
-              type="password"
-              name="confirmPassword"
-              placeholder="Re-enter new password"
-              icon={Lock}
-              {...register('confirmPassword', {
-                required: 'Please confirm your password',
-              })}
-              error={errors.confirmPassword?.message}
-              disabled={isLoading}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  {...register('confirmPassword', {
+                    required: 'Please confirm your password',
+                  })}
+                  disabled={isLoading}
+                  placeholder="Re-enter new password"
+                  className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
 
             {/* Submit Button */}
             <Button
@@ -257,8 +339,8 @@ const ResetPasswordPage = () => {
         </Card>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <p>&copy; 2026 Advance IT Solutions. All rights reserved.</p>
+        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Advance IT Solutions. All rights reserved.</p>
         </div>
       </div>
     </div>

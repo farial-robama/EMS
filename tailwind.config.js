@@ -4,7 +4,11 @@ export default {
   darkMode: 'class',
 
   // Ensure Tailwind scans all relevant files for utility classes
-  content: ['./index.html', './public/**/*.html', './src/**/*.{js,ts,jsx,tsx,html}'],
+  content: [
+    './index.html',
+    './public/**/*.html',
+    './src/**/*.{js,ts,jsx,tsx,html}',
+  ],
 
   theme: {
     extend: {
@@ -19,19 +23,20 @@ export default {
         primary: {
           DEFAULT: 'var(--color-primary)',
           50: 'var(--color-primary-50)',
-          100: 'var(--color-primary-100)'
+          100: 'var(--color-primary-100)',
         },
         success: 'var(--color-success)',
         danger: 'var(--color-danger)',
         warning: 'var(--color-warning)',
-        info: 'var(--color-info)'
+        info: 'var(--color-info)',
       },
 
       // Smooth theme transition support
       transitionProperty: {
-        theme: 'background-color, border-color, color, fill, stroke, box-shadow'
-      }
-    }
+        theme:
+          'background-color, border-color, color, fill, stroke, box-shadow',
+      },
+    },
   },
 
   plugins: [
@@ -39,11 +44,12 @@ export default {
     function ({ addUtilities }) {
       addUtilities({
         '.theme-transition': {
-          transitionProperty: 'background-color, border-color, color, fill, stroke, box-shadow',
+          transitionProperty:
+            'background-color, border-color, color, fill, stroke, box-shadow',
           transitionTimingFunction: 'ease-in-out',
-          transitionDuration: '300ms'
-        }
+          transitionDuration: '300ms',
+        },
       });
-    }
-  ]
+    },
+  ],
 };
