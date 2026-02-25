@@ -1,0 +1,346 @@
+// src/pages/admin/studentSetup/StudentRollPrefix.jsx
+import React, { useState, useMemo } from 'react';
+import {
+  ChevronRight, Plus, Pencil, Trash2, Search, Hash,
+  Check, AlertCircle, X, ChevronLeft,
+} from 'lucide-react';
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+const inp = `w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-600
+  bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white outline-none transition-all
+  focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30`;
+const inpErr = `w-full px-3 py-2.5 text-sm rounded-xl border border-red-400
+  bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white outline-none transition-all`;
+
+const Breadcrumb = ({ items }) => (
+  <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+    {items.map((item, i) => (
+      <React.Fragment key={item}>
+        <span className={i === items.length - 1
+          ? 'text-gray-700 dark:text-gray-200 font-semibold'
+          : 'hover:text-blue-500 cursor-pointer transition-colors'}>{item}</span>
+        {i < items.length - 1 && <ChevronRight size={12} className="text-gray-300 dark:text-gray-600" />}
+      </React.Fragment>
+    ))}
+  </nav>
+);
+
+const F = ({ label, required, error, children }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+      {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+    </label>
+    {children}
+    {error && <p className="flex items-center gap-1 text-xs text-red-500"><AlertCircle size={10} />{error}</p>}
+  </div>
+);
+
+const StatusBadge = ({ status }) => (
+  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+    ${status === 'Active'
+      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+      : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
+    <span className={`w-1.5 h-1.5 rounded-full ${status === 'Active' ? 'bg-green-500' : 'bg-red-400'}`} />
+    {status}
+  </span>
+);
+
+const SEED = [
+  { id:1, shift:'Morning', medium:'Bangla', eduLevel:'Higher Secondary', department:'Science',   className:'HSC-Science', session:'2025-2026', startNumber:'1001', status:'Active' },
+  { id:2, shift:'Day',     medium:'English',eduLevel:'Secondary',        department:'Arts',      className:'SSC-Arts',   session:'2025-2026', startNumber:'2001', status:'Active' },
+  { id:3, shift:'Evening', medium:'Bangla', eduLevel:'Higher Secondary', department:'Commerce',  className:'HSC-Commerce',session:'2024-2025', startNumber:'3001', status:'Inactive' },
+];
+
+const BLANK = { shift:'', medium:'', eduLevel:'', department:'', className:'', session:'', startNumber:'', status:'Active' };
+
+const FIELD_OPTS = {
+  shift:      ['','Morning','Day','Evening'],
+  medium:     ['','Bangla','English','Hindi'],
+  eduLevel:   ['','Primary','Secondary','Higher Secondary'],
+  department: ['','Science','Commerce','Arts'],
+  className:  ['','Class 1','Class 2','Class 3','HSC-Science','HSC-Arts','HSC-Commerce','SSC-Science'],
+  session:    ['','2024-2025','2025-2026','2026-2027'],
+  status:     ['Active','Inactive'],
+};
+
+/* ── Main Component ──────────────────────────────────────────────────────── */
+export default function StudentRollPrefix() {
+  const [prefixes, setPrefixes] = useState(SEED);
+  const [search, setSearch]     = useState('');
+  const [perPage, setPerPage]   = useState(10);
+  const [page, setPage]         = useState(1);
+  const [modal, setModal]       = useState(null); // null | 'add' | item
+  const [form, setForm]         = useState(BLANK);
+  const [errors, setErrors]     = useState({});
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [saving, setSaving]     = useState(false);
+
+  const filtered = useMemo(() =>
+    prefixes.filter(p =>
+      [p.shift,p.medium,p.eduLevel,p.department,p.className,p.session,p.startNumber]
+        .some(v => v?.toLowerCase().includes(search.toLowerCase()))
+    ), [prefixes, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage   = Math.min(page, totalPages);
+  const paged      = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+
+  const openAdd  = () => { setForm(BLANK); setErrors({}); setModal('add'); };
+  const openEdit = p  => { setForm({ ...p }); setErrors({}); setModal(p); };
+  const closeModal = () => { setModal(null); setErrors({}); };
+
+  const handleFormChange = e => {
+    const { name, value } = e.target;
+    setForm(p => ({ ...p, [name]: value }));
+    setErrors(p => ({ ...p, [name]: undefined }));
+  };
+
+  const validate = () => {
+    const e = {};
+    const required = ['shift','medium','eduLevel','department','className','session','startNumber'];
+    required.forEach(k => { if (!form[k]) e[k] = 'Required'; });
+    if (form.startNumber && (isNaN(form.startNumber) || form.startNumber.length !== 4))
+      e.startNumber = 'Must be a 4-digit number (1000–9999)';
+    return e;
+  };
+
+  const handleSave = async () => {
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setSaving(true);
+    await new Promise(r => setTimeout(r, 600));
+    setSaving(false);
+    if (modal === 'add') {
+      setPrefixes(p => [...p, { id: Date.now(), ...form }]);
+    } else {
+      setPrefixes(p => p.map(x => x.id === modal.id ? { ...x, ...form } : x));
+    }
+    closeModal();
+  };
+
+  const handleDelete = id => {
+    setPrefixes(p => p.filter(x => x.id !== id));
+    setDeleteConfirm(null);
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <Breadcrumb items={['Dashboard', 'Student Setup', 'Student Code Prefix']} />
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">Student Code Prefix</h1>
+        </div>
+        <button onClick={openAdd}
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-200 flex-shrink-0">
+          <Plus size={15} /> Add Prefix
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          { label:'Total Prefixes', value: prefixes.length,                           bg:'bg-blue-50 dark:bg-blue-900/20',   ic:'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300' },
+          { label:'Active',        value: prefixes.filter(p=>p.status==='Active').length, bg:'bg-green-50 dark:bg-green-900/20', ic:'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300' },
+          { label:'Inactive',      value: prefixes.filter(p=>p.status!=='Active').length, bg:'bg-red-50 dark:bg-red-900/20',     ic:'bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300' },
+        ].map(s => (
+          <div key={s.label} className={`flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-700 ${s.bg}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${s.ic}`}><Hash size={18} /></div>
+            <div>
+              <div className="text-2xl font-bold text-gray-800 dark:text-white leading-none">{s.value}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table Card */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Show</span>
+            <select value={perPage} onChange={e => { setPerPage(+e.target.value); setPage(1); }}
+              className="px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-blue-500 transition-all">
+              {[10,25,50,100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <span className="text-xs text-gray-500 dark:text-gray-400">entries</span>
+          </div>
+          <div className="relative">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <input type="text" placeholder="Search…" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+              className="pl-8 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 w-52 transition-all" />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                {['#','Shift','Medium','Edu. Level','Department','Class','Session','Prefix No.','Status','Actions'].map(h => (
+                  <th key={h} className={`px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap ${h==='Actions'?'text-right':''}`}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-700/50">
+              {paged.length === 0 ? (
+                <tr><td colSpan={10} className="px-5 py-14 text-center">
+                  <Hash size={36} className="mx-auto text-gray-200 dark:text-gray-600 mb-3" />
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No prefixes found</p>
+                </td></tr>
+              ) : paged.map((p, i) => (
+                <tr key={p.id} className="hover:bg-gray-50/70 dark:hover:bg-gray-700/20 transition-colors">
+                  <td className="px-4 py-3.5 text-sm text-gray-400">{(safePage-1)*perPage+i+1}</td>
+                  <td className="px-4 py-3.5 text-sm text-gray-700 dark:text-gray-300">{p.shift}</td>
+                  <td className="px-4 py-3.5 text-sm text-gray-700 dark:text-gray-300">{p.medium}</td>
+                  <td className="px-4 py-3.5 text-sm text-gray-700 dark:text-gray-300">{p.eduLevel}</td>
+                  <td className="px-4 py-3.5 text-sm text-gray-700 dark:text-gray-300">{p.department}</td>
+                  <td className="px-4 py-3.5">
+                    <span className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 px-2.5 py-1 rounded-lg">{p.className}</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm text-gray-700 dark:text-gray-300">{p.session}</td>
+                  <td className="px-4 py-3.5">
+                    <span className="font-mono font-bold text-sm text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-lg">{p.startNumber}</span>
+                  </td>
+                  <td className="px-4 py-3.5"><StatusBadge status={p.status} /></td>
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button onClick={() => openEdit(p)}
+                        className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center justify-center transition-all border border-amber-100 dark:border-amber-900">
+                        <Pencil size={13} />
+                      </button>
+                      <button onClick={() => setDeleteConfirm(p)}
+                        className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 flex items-center justify-center transition-all border border-red-100 dark:border-red-900">
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Showing {filtered.length === 0 ? 0 : (safePage-1)*perPage+1}–{Math.min(safePage*perPage, filtered.length)} of {filtered.length} entries
+          </p>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(p=>Math.max(1,p-1))} disabled={safePage===1}
+              className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 disabled:opacity-40 hover:bg-gray-100 flex items-center justify-center transition-all">
+              <ChevronLeft size={14} />
+            </button>
+            {Array.from({length:totalPages},(_,i)=>i+1)
+              .filter(p=>p===1||p===totalPages||Math.abs(p-safePage)<=1)
+              .reduce((acc,p,i,arr)=>{if(i>0&&p-arr[i-1]>1)acc.push('…');acc.push(p);return acc;},[])
+              .map((p,i)=>typeof p==='string'
+                ?<span key={i} className="w-8 h-8 flex items-center justify-center text-xs text-gray-400">…</span>
+                :<button key={p} onClick={()=>setPage(p)}
+                    className={`w-8 h-8 rounded-lg border text-xs font-medium transition-all
+                      ${safePage===p?'bg-blue-600 text-white border-blue-600 shadow-sm':'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100'}`}>{p}</button>
+              )}
+            <button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={safePage===totalPages}
+              className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 disabled:opacity-40 hover:bg-gray-100 flex items-center justify-center transition-all">
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Add / Edit Modal ─────────────────────────────────────────────── */}
+      {modal !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+            onClick={e=>e.stopPropagation()}>
+            <div className={`flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700
+              ${modal==='add'?'bg-blue-50 dark:bg-blue-900/20':'bg-amber-50 dark:bg-amber-900/10'}`}>
+              <div className="flex items-center gap-2.5">
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center
+                  ${modal==='add'?'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400':'bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400'}`}>
+                  {modal==='add'?<Plus size={14}/>:<Pencil size={13}/>}
+                </div>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  {modal==='add'?'Create Student Code Prefix':'Edit Prefix'}
+                </span>
+              </div>
+              <button onClick={closeModal} className="w-7 h-7 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-500 transition-all">
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="p-5">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label:'Shift',      name:'shift',      type:'select', req:true },
+                  { label:'Medium',     name:'medium',     type:'select', req:true },
+                  { label:'Edu. Level', name:'eduLevel',   type:'select', req:true },
+                  { label:'Department', name:'department', type:'select', req:true },
+                  { label:'Class',      name:'className',  type:'select', req:true },
+                  { label:'Session',    name:'session',    type:'select', req:true },
+                ].map(f => (
+                  <F key={f.name} label={f.label} required={f.req} error={errors[f.name]}>
+                    <select name={f.name} value={form[f.name]} onChange={handleFormChange}
+                      className={errors[f.name] ? `${inp} border-red-400` : inp}>
+                      {(FIELD_OPTS[f.name]||[]).map(o=><option key={o} value={o}>{o||'Select'}</option>)}
+                    </select>
+                  </F>
+                ))}
+                <F label="Start Number (4-digit)" required error={errors.startNumber}>
+                  <input type="number" name="startNumber" value={form.startNumber}
+                    onChange={handleFormChange} min={1000} max={9999}
+                    placeholder="e.g. 1001"
+                    className={errors.startNumber ? inpErr : inp} />
+                </F>
+                <F label="Status">
+                  <div className="flex gap-2 mt-0.5">
+                    {['Active','Inactive'].map(s=>(
+                      <button key={s} type="button" onClick={()=>setForm(p=>({...p,status:s}))}
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-all
+                          ${form.status===s
+                            ?s==='Active'?'bg-green-600 text-white border-green-600':'bg-red-500 text-white border-red-500'
+                            :'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-300'}`}>{s}</button>
+                    ))}
+                  </div>
+                </F>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+              <button onClick={closeModal}
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+                Cancel
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl transition-colors shadow-sm
+                  ${saving?'bg-blue-400 cursor-not-allowed':modal==='add'?'bg-blue-600 hover:bg-blue-700 shadow-blue-200':'bg-amber-500 hover:bg-amber-600 shadow-amber-200'}`}>
+                {saving?<><span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"/>Saving…</>:<><Check size={13}/>{modal==='add'?'Save Prefix':'Update Prefix'}</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={()=>setDeleteConfirm(null)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 text-center"
+            onClick={e=>e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-500"/>
+            </div>
+            <h3 className="text-base font-bold text-gray-800 dark:text-white mb-1">Delete Prefix?</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+              Prefix <span className="font-bold text-gray-700 dark:text-gray-200">{deleteConfirm.startNumber}</span> for <span className="font-semibold">{deleteConfirm.className}</span> will be permanently removed.
+            </p>
+            <div className="flex gap-2">
+              <button onClick={()=>setDeleteConfirm(null)} className="flex-1 py-2.5 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+              <button onClick={()=>handleDelete(deleteConfirm.id)} className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm shadow-red-200">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
