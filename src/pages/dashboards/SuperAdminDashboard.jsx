@@ -247,7 +247,7 @@ const SuperAdminDashboard = () => {
             <Button
               variant="primary"
               icon={Settings}
-              onClick={() => navigate('/super-admin/settings')}
+              onClick={() => navigate('/super-admin/settings/general')}
             >
               System Settings
             </Button>

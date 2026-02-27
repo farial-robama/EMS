@@ -1,7 +1,7 @@
 // src/pages/auth/LoginPage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { validateUserId } from '../../utils/validation';
@@ -433,6 +433,8 @@ const Field = ({ label, name, icon, type = 'text', register, errors, disabled, s
 const LoginPage = () => {
   const { login, isAuthenticated, isLoading: authLoading, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const toastShownRef = useRef(false);
 
   const rememberedUser = loadRememberedUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -453,12 +455,23 @@ const LoginPage = () => {
     };
   }, []);
 
+  
   useEffect(() => {
-    if (authLoading) return;
-    if (isAuthenticated && user?.role) {
-      navigate(getRouteForRole(user.role), { replace: true });
-    }
-  }, [authLoading, isAuthenticated, user?.role, navigate]);
+  if (authLoading) return;
+  if (isAuthenticated && user?.role) {
+    navigate(getRouteForRole(user.role), { replace: true });
+  }
+}, [authLoading, isAuthenticated, user?.role, navigate]);
+
+
+
+useEffect(() => {
+  if (location.state?.loggedOut && !toastShownRef.current) {
+    toastShownRef.current = true;  
+    showSuccess('Logged out successfully! 👋');
+    navigate(location.pathname, { replace: true, state: {} });
+  }
+}, []);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

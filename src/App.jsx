@@ -32,16 +32,18 @@ const RootRedirect = () => {
   }
 
   const roleRoutes = {
-    super_admin : '/super-admin/dashboard',
-    admin       : '/admin/dashboard',
-    teacher     : '/teacher/dashboard',
-    student     : '/student/dashboard',
+    super_admin: '/super-admin/dashboard',
+    admin: '/admin/dashboard',
+    teacher: '/teacher/dashboard',
+    student: '/student/dashboard',
   };
 
-  return <Navigate to={roleRoutes[user.role] || '/student/dashboard'} replace />;
+  return (
+    <Navigate to={roleRoutes[user.role] || '/student/dashboard'} replace />
+  );
 };
 
-// ─── ✅ FIX: PageWrapper OUTSIDE AppRoutes so it's never recreated ────────────
+
 const PageWrapper = ({ meta, children }) => {
   const title = meta?.title
     ? `${meta.title} • Educational Management System`
@@ -59,7 +61,9 @@ const PageWrapper = ({ meta, children }) => {
             {meta.breadcrumbs.map((b, i) => (
               <li key={i} className="flex items-center">
                 {b.path ? (
-                  <Link to={b.path} className="hover:underline">{b.label}</Link>
+                  <Link to={b.path} className="hover:underline">
+                    {b.label}
+                  </Link>
                 ) : (
                   <span>{b.label}</span>
                 )}
@@ -76,11 +80,11 @@ const PageWrapper = ({ meta, children }) => {
   );
 };
 
-// ─── ✅ FIX: Build route elements ONCE outside any component ──────────────────
+
 const builtRoutes = routes.map((r) => {
   const Page = r.element;
 
-  // Stable component — created once at module load, never recreated
+  
   const PageWithMeta = (props) => (
     <PageWrapper meta={r}>
       <Page {...props} />
@@ -136,10 +140,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-

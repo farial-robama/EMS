@@ -75,7 +75,9 @@ const StudentDashboard = () => {
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {s.value}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{s.label}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {s.label}
+                    </div>
                   </div>
                 </div>
               </Card>

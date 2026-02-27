@@ -385,7 +385,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_data');
       localStorage.removeItem('user_role');
-      window.location.href = '/auth/login';
+      // window.location.href = '/auth/login';
     }
   };
 

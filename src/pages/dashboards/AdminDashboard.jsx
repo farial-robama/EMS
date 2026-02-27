@@ -87,7 +87,9 @@ const AdminDashboard = () => {
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {s.value}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{s.label}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {s.label}
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -96,7 +98,7 @@ const AdminDashboard = () => {
         </section>
 
         <section className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-3">
+          <h2 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-3">
             Quick Actions
           </h2>
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">

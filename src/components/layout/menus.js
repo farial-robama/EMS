@@ -65,12 +65,12 @@ export const superAdminMenu = [
         path: '/super-admin/users/roles',
         permission: 'users.roles.view',
       },
-      {
-        id: 'all-users',
-        label: 'All Users',
-        path: '/super-admin/users',
-        permission: 'users.view',
-      },
+      // {
+      //   id: 'all-users',
+      //   label: 'All Users',
+      //   path: '/super-admin/users',
+      //   permission: 'users.view',
+      // },
     ],
   },
 
