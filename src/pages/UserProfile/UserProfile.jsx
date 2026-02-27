@@ -24,6 +24,7 @@ import {
   UserCircle,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const UserProfile = () => {
   const { user, token, updateUserProfile, updateProfileImage, refreshUserData } = useAuth();
@@ -295,7 +296,8 @@ const UserProfile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-8">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
         {/* Profile Header Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-6">
@@ -696,7 +698,14 @@ const UserProfile = () => {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 };
 
 export default UserProfile;
+
+
+
+
+
+

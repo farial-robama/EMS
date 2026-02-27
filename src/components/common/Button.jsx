@@ -18,11 +18,16 @@ const Button = ({
 }) => {
   // Variant styles with dark-mode variants and an outline variant
   const variantClasses = {
-    primary: 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 active:bg-blue-800 dark:active:bg-blue-700 text-white',
-    secondary: 'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 active:bg-gray-800 dark:active:bg-gray-700 text-white',
-    danger: 'bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600 active:bg-red-800 dark:active:bg-red-700 text-white',
-    success: 'bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 active:bg-green-800 dark:active:bg-green-700 text-white',
-    outline: 'bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+    primary:
+      'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 active:bg-blue-800 dark:active:bg-blue-700 text-white',
+    secondary:
+      'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 active:bg-gray-800 dark:active:bg-gray-700 text-white',
+    danger:
+      'bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600 active:bg-red-800 dark:active:bg-red-700 text-white',
+    success:
+      'bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 active:bg-green-800 dark:active:bg-green-700 text-white',
+    outline:
+      'bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700',
   };
 
   // Size styles
@@ -51,7 +56,7 @@ const Button = ({
     secondary: 'focus:ring-gray-500 dark:focus:ring-gray-400',
     danger: 'focus:ring-red-500 dark:focus:ring-red-400',
     success: 'focus:ring-green-500 dark:focus:ring-green-400',
-    outline: 'focus:ring-black/10 dark:focus:ring-white/10'
+    outline: 'focus:ring-black/10 dark:focus:ring-white/10',
   };
 
   const finalClasses = `${baseClasses} ${focusRingClasses[variant]}`;
