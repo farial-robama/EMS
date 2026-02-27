@@ -17,7 +17,7 @@ import {
   Layers,
   ShieldCheck,
   Globe,
-  Briefcase,   // ✅ Replaces UserTie (not available in all versions)
+  Briefcase, // ✅ Replaces UserTie (not available in all versions)
   Cog,
   Table,
   Award,
@@ -406,7 +406,7 @@ export const superAdminMenu = [
   {
     id: 'teacher-staff',
     label: 'Teacher & Staff',
-    icon: Briefcase,   // ✅ Fixed: was UserTie
+    icon: Briefcase, // ✅ Fixed: was UserTie
     permission: 'teachers.view',
     submenus: [
       {
@@ -496,6 +496,18 @@ export const superAdminMenu = [
         label: 'Student Migration',
         path: '/super-admin/students/migration',
         permission: 'students.migration.view',
+      },
+      {
+        id: 'remove-duplicate-students',
+        label: 'Remove Duplicate Students',
+        path: '/super-admin/students/remove-duplicates',
+        permission: 'students.remove-duplicates.view',
+      },
+      {
+        id: 'student-roll-prefix',
+        label: 'Student Roll Prefix',
+        path: '/super-admin/students/roll-prefix',
+        permission: 'students.roll-prefix.view',
       },
       {
         id: 'archive-students',

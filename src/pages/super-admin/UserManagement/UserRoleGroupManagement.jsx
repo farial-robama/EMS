@@ -1,5 +1,4 @@
 // src/pages/super-admin/UserRoleGroupManagement.jsx
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -22,64 +21,6 @@ import {
 import DashboardLayout from '../../../components/layout/DashboardLayout';
 import { showSuccess, showError } from '../../../utils/toast';
 
-// ─── theme tokens function ─────────────────────────────────────────────────
-const getTheme = (isDark) => {
-  if (isDark) {
-    return {
-      bg: '#0f172a',
-      surface: '#1e293b',
-      surfaceHi: '#334155',
-      surfaceAlt: '#1a2332',
-      border: 'rgba(99,102,241,0.18)',
-      borderHover: 'rgba(99,102,241,0.45)',
-      borderSubtle: 'rgba(148,163,184,0.15)',
-      accent: '#6366f1',
-      accentHi: '#818cf8',
-      accentLo: 'rgba(99,102,241,0.12)',
-      text: '#f1f5f9',
-      textMid: '#94a3b8',
-      textLo: '#64748b',
-      danger: '#ef4444',
-      dangerLo: 'rgba(239,68,68,0.12)',
-      success: '#10b981',
-      successLo: 'rgba(16,185,129,0.12)',
-      warn: '#f59e0b',
-      warnLo: 'rgba(245,158,11,0.12)',
-      overlayBg: 'rgba(0,0,0,0.55)',
-      shadow: '0 28px 60px rgba(0,0,0,0.4)',
-      shadowMd: '0 10px 35px rgba(0,0,0,0.25)',
-      shadowSm: '0 3px 14px rgba(99,102,241,0.35)',
-    };
-  }
-
-  // Light theme
-  return {
-    bg: '#f8fafc',
-    surface: '#ffffff',
-    surfaceHi: '#f1f5f9',
-    surfaceAlt: '#f9fafb',
-    border: 'rgba(99,102,241,0.2)',
-    borderHover: 'rgba(99,102,241,0.5)',
-    borderSubtle: 'rgba(148,163,184,0.25)',
-    accent: '#6366f1',
-    accentHi: '#4f46e5',
-    accentLo: 'rgba(99,102,241,0.08)',
-    text: '#0f172a',
-    textMid: '#475569',
-    textLo: '#64748b',
-    danger: '#dc2626',
-    dangerLo: 'rgba(220,38,38,0.08)',
-    success: '#059669',
-    successLo: 'rgba(5,150,105,0.08)',
-    warn: '#d97706',
-    warnLo: 'rgba(217,119,6,0.08)',
-    overlayBg: 'rgba(0,0,0,0.4)',
-    shadow: '0 28px 60px rgba(0,0,0,0.15)',
-    shadowMd: '0 10px 35px rgba(0,0,0,0.1)',
-    shadowSm: '0 3px 14px rgba(99,102,241,0.25)',
-  };
-};
-
 // ─── seed data ─────────────────────────────────────────────────────────────
 const seedRoles = [
   {
@@ -94,7 +35,12 @@ const seedRoles = [
   {
     id: 2,
     role: 'Teacher',
-    permissions: ['View Result', 'Manage Students', 'Grade Assignments', 'Access Library'],
+    permissions: [
+      'View Result',
+      'Manage Students',
+      'Grade Assignments',
+      'Access Library',
+    ],
     createdBy: 'Admin',
     createdAt: '2025-01-15 10:32 AM',
     editedBy: 'Admin',
@@ -103,7 +49,13 @@ const seedRoles = [
   {
     id: 3,
     role: 'Admin',
-    permissions: ['Manage Users', 'Payment', 'View Result', 'System Settings', 'Access Library'],
+    permissions: [
+      'Manage Users',
+      'Payment',
+      'View Result',
+      'System Settings',
+      'Access Library',
+    ],
     createdBy: 'System',
     createdAt: '2025-01-10 08:00 AM',
     editedBy: 'System',
@@ -112,19 +64,52 @@ const seedRoles = [
 ];
 
 const PREDEFINED_ROLES = [
-  { value: 'Student', icon: Users, color: '#10b981' },
-  { value: 'Teacher', icon: UserCog, color: '#f59e0b' },
-  { value: 'Admin', icon: Shield, color: '#ef4444' },
-  { value: 'Staff', icon: Users, color: '#6366f1' },
-  { value: 'Guest', icon: Lock, color: '#64748b' },
+  {
+    value: 'Student',
+    icon: Users,
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+  },
+  {
+    value: 'Teacher',
+    icon: UserCog,
+    color: 'text-amber-600 dark:text-amber-400',
+    bg: 'bg-amber-100 dark:bg-amber-900/30',
+  },
+  {
+    value: 'Admin',
+    icon: Shield,
+    color: 'text-red-600 dark:text-red-400',
+    bg: 'bg-red-100 dark:bg-red-900/30',
+  },
+  {
+    value: 'Staff',
+    icon: Users,
+    color: 'text-blue-600 dark:text-blue-400',
+    bg: 'bg-blue-100 dark:bg-blue-900/30',
+  },
+  {
+    value: 'Guest',
+    icon: Lock,
+    color: 'text-gray-600 dark:text-gray-400',
+    bg: 'bg-gray-100 dark:bg-gray-700',
+  },
 ];
 
 const PERMISSIONS = [
   { id: 'view_result', label: 'View Result', category: 'Academic' },
   { id: 'submit_assignment', label: 'Submit Assignment', category: 'Academic' },
   { id: 'grade_assignments', label: 'Grade Assignments', category: 'Academic' },
-  { id: 'manage_students', label: 'Manage Students', category: 'User Management' },
-  { id: 'manage_teachers', label: 'Manage Teachers', category: 'User Management' },
+  {
+    id: 'manage_students',
+    label: 'Manage Students',
+    category: 'User Management',
+  },
+  {
+    id: 'manage_teachers',
+    label: 'Manage Teachers',
+    category: 'User Management',
+  },
   { id: 'manage_users', label: 'Manage Users', category: 'User Management' },
   { id: 'payment', label: 'Payment', category: 'Financial' },
   { id: 'view_reports', label: 'View Reports', category: 'Financial' },
@@ -134,160 +119,146 @@ const PERMISSIONS = [
   { id: 'backup_restore', label: 'Backup & Restore', category: 'System' },
 ];
 
-// ─── helpers ───────────────────────────────────────────────────────────────
-const nextId = (arr) => (arr.length ? Math.max(...arr.map((r) => r.id)) + 1 : 1);
-
-const emptyRole = () => ({
-  role: '',
-  permissions: [],
-});
-
-const formatDate = () => {
-  const now = new Date();
-  return now.toLocaleDateString('en-US', {
+const nextId = (arr) =>
+  arr.length ? Math.max(...arr.map((r) => r.id)) + 1 : 1;
+const emptyRole = () => ({ role: '', permissions: [] });
+const formatDate = () =>
+  new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  }) + ' ' + now.toLocaleTimeString('en-US', {
+  }) +
+  ' ' +
+  new Date().toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
   });
-};
 
-// ─── Delete Confirm Modal ──────────────────────────────────────────────────
-const DeleteConfirm = ({ role, onCancel, onConfirm, theme }) => (
-  <div
-    style={{
-      position: 'fixed',
-      inset: 0,
-      background: theme.overlayBg,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 10000,
-      backdropFilter: 'blur(3px)',
-    }}
-    onClick={onCancel}
-  >
-    <div
-      style={{
-        background: theme.surface,
-        borderRadius: 18,
-        border: `1px solid ${theme.border}`,
-        padding: '28px 26px',
-        width: '90%',
-        maxWidth: 420,
-        boxShadow: theme.shadow,
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 12,
-          background: theme.dangerLo,
-          border: `1px solid ${theme.danger}33`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 16px',
-        }}
-      >
-        <AlertTriangle size={24} color={theme.danger} />
-      </div>
-      <h3
-        style={{
-          margin: '0 0 8px',
-          fontSize: 18,
-          fontWeight: 700,
-          color: theme.text,
-          textAlign: 'center',
-        }}
-      >
-        Delete "{role.role}" Role?
-      </h3>
-      <p style={{ margin: '0 0 24px', fontSize: 14, color: theme.textMid, textAlign: 'center' }}>
-        This will remove all permissions associated with this role. This action cannot be undone.
-      </p>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button
-          onClick={onCancel}
-          style={{
-            flex: 1,
-            padding: '10px 20px',
-            borderRadius: 10,
-            border: `1px solid ${theme.borderSubtle}`,
-            background: theme.surfaceHi,
-            color: theme.textMid,
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            transition: 'all .15s',
-          }}
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          style={{
-            flex: 1,
-            padding: '10px 20px',
-            borderRadius: 10,
-            border: 'none',
-            background: theme.danger,
-            color: '#fff',
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            boxShadow: `0 3px 12px ${theme.danger}40`,
-            transition: 'all .15s',
-          }}
-        >
-          Delete
-        </button>
-      </div>
+// ─── Shared helpers ────────────────────────────────────────────────────────
+const inp =
+  'w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30';
+const inpErr =
+  'w-full px-3 py-2.5 text-sm rounded-lg border border-red-400 bg-gray-50 dark:bg-gray-700 dark:text-white outline-none';
+
+function F({ label, required, error, children }) {
+  return (
+    <div className="flex flex-col gap-1.5 mb-4">
+      <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
+      {error && (
+        <p className="flex items-center gap-1 text-xs text-red-500">
+          <AlertTriangle size={11} />
+          {error}
+        </p>
+      )}
     </div>
-  </div>
+  );
+}
+
+const Breadcrumb = ({ items }) => (
+  <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+    {items.map((item, i) => (
+      <React.Fragment key={`${item}-${i}`}>
+        <span
+          className={
+            i === items.length - 1
+              ? 'text-gray-700 dark:text-gray-200 font-medium'
+              : 'hover:text-blue-500 cursor-pointer transition-colors'
+          }
+        >
+          {item}
+        </span>
+        {i < items.length - 1 && (
+          <ChevronRight
+            size={12}
+            className="text-gray-300 dark:text-gray-600"
+          />
+        )}
+      </React.Fragment>
+    ))}
+  </nav>
 );
+
+// ─── Permission Checkbox Grid ──────────────────────────────────────────────
+function PermissionGrid({ permissions, onChange }) {
+  const grouped = useMemo(() => {
+    const g = {};
+    PERMISSIONS.forEach((p) => {
+      if (!g[p.category]) g[p.category] = [];
+      g[p.category].push(p);
+    });
+    return g;
+  }, []);
+
+  return (
+    <div className="max-h-72 overflow-y-auto pr-1 space-y-4">
+      {Object.entries(grouped).map(([category, perms]) => (
+        <div key={category}>
+          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">
+            {category}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {perms.map((perm) => {
+              const checked = permissions.includes(perm.label);
+              return (
+                <label
+                  key={perm.id}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm font-medium
+                    ${
+                      checked
+                        ? 'border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                        : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/40 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => onChange(perm.label)}
+                    className="hidden"
+                  />
+                  <div
+                    className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all
+                    ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-gray-500'}`}
+                  >
+                    {checked && (
+                      <Check size={10} className="text-white" strokeWidth={3} />
+                    )}
+                  </div>
+                  {perm.label}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function UserRoleGroupManagement() {
-  // Theme state - adjust based on your theme provider
-  const [isDark, setIsDark] = useState(true);
-  const T = getTheme(isDark);
-
-  const [roles, setRoles] = useState(() => {
-    const stored = localStorage.getItem('roles');
-    return stored ? JSON.parse(stored) : seedRoles;
-  });
-
-  const [modal, setModal] = useState(null); // null | 'add' | 'edit' | 'view'
+  const [roles, setRoles] = useState(seedRoles);
+  const [modal, setModal] = useState(null);
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(emptyRole());
   const [formErrors, setFormErrors] = useState({});
   const [deleteTarget, setDeleteTarget] = useState(null);
-
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('All');
   const [page, setPage] = useState(1);
+  const [saving, setSaving] = useState(false);
 
   const PAGE_SIZE = 6;
 
-  // Persist roles to localStorage
-  useEffect(() => {
-    localStorage.setItem('roles', JSON.stringify(roles));
-  }, [roles]);
-
-  // Lock scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = modal ? 'hidden' : 'auto';
-    return () => (document.body.style.overflow = 'auto');
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [modal]);
 
-  // ── Filtered & Paginated Data ──────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return roles.filter(
@@ -299,27 +270,27 @@ export default function UserRoleGroupManagement() {
   }, [roles, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE
+  );
 
-  // ── Actions ────────────────────────────────────────────────────────────
   const openAdd = () => {
     setForm(emptyRole());
     setFormErrors({});
     setModal('add');
   };
-
-  const openView = (role) => {
-    setSelected(role);
+  const openView = (r) => {
+    setSelected(r);
     setModal('view');
   };
-
-  const openEdit = (role) => {
-    setSelected(role);
-    setForm({ ...role });
+  const openEdit = (r) => {
+    setSelected(r);
+    setForm({ ...r });
     setFormErrors({});
     setModal('edit');
   };
-
   const closeModal = () => {
     setModal(null);
     setSelected(null);
@@ -327,25 +298,26 @@ export default function UserRoleGroupManagement() {
   };
 
   const validate = (f) => {
-    const errs = {};
-    if (!f.role.trim()) errs.role = 'Role name is required.';
-    if (f.permissions.length === 0) errs.permissions = 'At least one permission is required.';
-    return errs;
+    const e = {};
+    if (!f.role.trim()) e.role = 'Role name is required.';
+    if (f.permissions.length === 0)
+      e.permissions = 'At least one permission is required.';
+    return e;
   };
 
-  const handleSaveNew = () => {
+  const handleSaveNew = async () => {
     const errs = validate(form);
     if (Object.keys(errs).length) {
       setFormErrors(errs);
       return;
     }
-
-    // Check for duplicate role
     if (roles.some((r) => r.role.toLowerCase() === form.role.toLowerCase())) {
       showError('A role with this name already exists.');
       return;
     }
-
+    setSaving(true);
+    await new Promise((r) => setTimeout(r, 600));
+    setSaving(false);
     const now = formatDate();
     setRoles((prev) => [
       ...prev,
@@ -362,21 +334,19 @@ export default function UserRoleGroupManagement() {
     closeModal();
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     const errs = validate(form);
     if (Object.keys(errs).length) {
       setFormErrors(errs);
       return;
     }
-
+    setSaving(true);
+    await new Promise((r) => setTimeout(r, 600));
+    setSaving(false);
     setRoles((prev) =>
       prev.map((r) =>
         r.id === form.id
-          ? {
-              ...form,
-              editedBy: 'Admin',
-              updatedAt: formatDate(),
-            }
+          ? { ...form, editedBy: 'Admin', updatedAt: formatDate() }
           : r
       )
     );
@@ -384,873 +354,578 @@ export default function UserRoleGroupManagement() {
     closeModal();
   };
 
-  const confirmDelete = (role) => setDeleteTarget(role);
-
   const executeDelete = () => {
-    const newRoles = roles.filter((r) => r.id !== deleteTarget.id);
-    setRoles(newRoles);
-    setPage((p) => Math.min(p, Math.ceil(newRoles.length / PAGE_SIZE) || 1));
+    setRoles((prev) => prev.filter((r) => r.id !== deleteTarget.id));
+    setPage((p) => Math.min(p, Math.ceil((roles.length - 1) / PAGE_SIZE) || 1));
     showSuccess(`"${deleteTarget.role}" role deleted.`);
     setDeleteTarget(null);
   };
 
-  const togglePermission = (permLabel) => {
+  const togglePermission = (label) => {
     setForm((f) => ({
       ...f,
-      permissions: f.permissions.includes(permLabel)
-        ? f.permissions.filter((p) => p !== permLabel)
-        : [...f.permissions, permLabel],
+      permissions: f.permissions.includes(label)
+        ? f.permissions.filter((p) => p !== label)
+        : [...f.permissions, label],
     }));
   };
 
-  // ── Render Helpers ─────────────────────────────────────────────────────
-  const ActionBtn = ({ icon: Icon, color, title, onClick }) => (
-    <button
-      onClick={onClick}
-      title={title}
-      style={{
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        border: `1px solid ${T.surfaceHi}`,
-        background: T.surface,
-        color,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'all .15s',
-        boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.05)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = T.surfaceHi;
-        e.currentTarget.style.borderColor = color;
-        e.currentTarget.style.boxShadow = `0 2px 8px ${color}30`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = T.surface;
-        e.currentTarget.style.borderColor = T.surfaceHi;
-        e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.05)';
-      }}
-    >
-      <Icon size={16} />
-    </button>
-  );
-
-  const FormField = ({ label, children, error, style }) => (
-    <div style={{ marginBottom: 18, ...style }}>
-      <label style={{ display: 'block', marginBottom: 7, fontSize: 13, fontWeight: 600, color: T.text }}>
-        {label}
-      </label>
-      {children}
-      {error && (
-        <div style={{ marginTop: 6, fontSize: 12, color: T.danger, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <AlertTriangle size={13} />
-          {error}
+  // ── Modal template ─────────────────────────────────────────────────────
+  function RoleModal({ titleText, headerClass, iconEl, footerBtn, children }) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onClick={closeModal}
+      >
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div
+          className="relative w-full max-w-xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden max-h-[90vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* header */}
+          <div
+            className={`flex items-center justify-between px-5 py-4 border-b ${headerClass}`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center">
+                {iconEl}
+              </div>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                {titleText}
+              </span>
+            </div>
+            <button
+              onClick={closeModal}
+              className="w-7 h-7 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-500 transition-all"
+            >
+              <X size={14} />
+            </button>
+          </div>
+          {/* scrollable body */}
+          <div className="p-5 overflow-y-auto flex-1">{children}</div>
+          {/* footer */}
+          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+            <button
+              onClick={closeModal}
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+            {footerBtn}
+          </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
 
-  const inputStyle = {
-    width: '100%',
-    padding: '10px 13px',
-    borderRadius: 10,
-    border: `1px solid ${T.borderSubtle}`,
-    background: T.surfaceAlt,
-    color: T.text,
-    fontSize: 14,
-    fontFamily: 'inherit',
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'all .15s',
-  };
-
-  // Group permissions by category
-  const permissionsByCategory = useMemo(() => {
-    const grouped = {};
-    PERMISSIONS.forEach((perm) => {
-      if (!grouped[perm.category]) grouped[perm.category] = [];
-      grouped[perm.category].push(perm);
-    });
-    return grouped;
-  }, []);
-
-  // ─── RENDER ────────────────────────────────────────────────────────────
   return (
     <DashboardLayout>
-      <div style={{ padding: '28px 32px', background: T.bg, minHeight: '100vh' }}>
-        {/* ── Page Header ──────────────────────────────────────────────── */}
-        <div style={{ marginBottom: 26 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  background: T.accentLo,
-                  border: `1px solid ${T.border}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ShieldCheck size={22} color={T.accent} />
-              </div>
-              <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: T.text }}>Role Management</h1>
-            </div>
-
-            {/* Breadcrumb */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: T.textLo }}>
-              <Link to="/dashboard" style={{ color: T.textLo, textDecoration: 'none' }}>
-                Dashboard
-              </Link>
-              <span>›</span>
-              <Link to="/users" style={{ color: T.textLo, textDecoration: 'none' }}>
-                Users
-              </Link>
-              <span>›</span>
-              <span style={{ color: T.accent, fontWeight: 600 }}>Role Management</span>
-            </div>
+      <div className="space-y-5">
+        {/* ── Header ─────────────────────────────────────────────────────── */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <Breadcrumb items={['Dashboard', 'Users', 'Role Management']} />
+            <h1 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <ShieldCheck size={22} className="text-indigo-500" /> Role
+              Management
+            </h1>
           </div>
-
           <button
             onClick={openAdd}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 20px',
-              borderRadius: 11,
-              border: 'none',
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              boxShadow: T.shadowSm,
-              transition: 'all .2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(99,102,241,0.5)')}
-            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = T.shadowSm)}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-200 flex-shrink-0"
           >
-            <Plus size={18} />
-            Add Role
+            <Plus size={15} /> Add Role
           </button>
         </div>
 
-        {/* ── Toolbar: Search ───────────────────────────────────────────── */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-            marginBottom: 24,
-            flexWrap: 'wrap',
-          }}
-        >
-          {/* Search */}
-          <div style={{ position: 'relative', flex: '1 1 280px', minWidth: 200 }}>
-            <Search
-              size={16}
-              style={{
-                position: 'absolute',
-                left: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: T.textLo,
-              }}
-            />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Search roles or permissions…"
-              style={{
-                ...inputStyle,
-                paddingLeft: 36,
-                height: 40,
-              }}
-              onFocus={(e) => (e.target.style.borderColor = T.accent)}
-              onBlur={(e) => (e.target.style.borderColor = T.borderSubtle)}
-            />
-          </div>
-
-          {/* Summary Badge */}
-          <div
-            style={{
-              padding: '6px 12px',
-              borderRadius: 20,
-              background: T.surfaceHi,
-              border: `1px solid ${T.borderSubtle}`,
-              fontSize: 13,
-              fontWeight: 600,
-              color: T.textMid,
-            }}
-          >
-            {filtered.length} role{filtered.length !== 1 ? 's' : ''}
-          </div>
+        {/* ── Stats ──────────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            {
+              label: 'Total Roles',
+              value: roles.length,
+              bg: 'bg-blue-50 dark:bg-blue-900/20',
+              ic: 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300',
+            },
+            {
+              label: 'Total Permissions',
+              value: PERMISSIONS.length,
+              bg: 'bg-purple-50 dark:bg-purple-900/20',
+              ic: 'bg-purple-100 dark:bg-purple-800 text-purple-600 dark:text-purple-300',
+            },
+            {
+              label: 'Avg. Permissions',
+              value: roles.length
+                ? Math.round(
+                    roles.reduce((a, r) => a + r.permissions.length, 0) /
+                      roles.length
+                  )
+                : 0,
+              bg: 'bg-green-50 dark:bg-green-900/20',
+              ic: 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300',
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={`flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-700 ${s.bg}`}
+            >
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${s.ic}`}
+              >
+                <ShieldCheck size={18} />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-800 dark:text-white leading-none">
+                  {s.value}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {s.label}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* ── Table ─────────────────────────────────────────────────────── */}
-        <div
-          style={{
-            background: T.surface,
-            borderRadius: 16,
-            border: `1px solid ${T.borderSubtle}`,
-            overflow: 'hidden',
-            boxShadow: isDark ? T.shadowMd : '0 2px 8px rgba(0,0,0,0.04)',
-          }}
-        >
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: T.surfaceHi, borderBottom: `1px solid ${T.borderSubtle}` }}>
-                {['#', 'Role', 'Permissions', 'Created By', 'Last Updated', 'Actions'].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: '14px 16px',
-                      textAlign: 'left',
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: T.textLo,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    style={{
-                      padding: 60,
-                      textAlign: 'center',
-                      color: T.textLo,
-                      fontSize: 14,
-                    }}
-                  >
-                    <ShieldCheck size={40} color={T.textLo} style={{ marginBottom: 12, opacity: 0.4 }} />
-                    <div>No roles match your search.</div>
-                  </td>
-                </tr>
-              ) : (
-                paginated.map((role, i) => {
-                  const roleConfig = PREDEFINED_ROLES.find((r) => r.value === role.role);
-                  const RoleIcon = roleConfig?.icon || ShieldCheck;
-                  const roleColor = roleConfig?.color || T.accent;
+        {/* ── Table Card ─────────────────────────────────────────────────── */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+          {/* Toolbar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+              <ShieldCheck size={16} className="text-indigo-500" />
+              Roles
+              <span className="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-medium">
+                {filtered.length} roles
+              </span>
+            </div>
+            <div className="relative">
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              />
+              <input
+                type="text"
+                placeholder="Search roles or permissions…"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                className="pl-8 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 w-56 transition-all"
+              />
+            </div>
+          </div>
 
-                  return (
-                    <tr
-                      key={role.id}
-                      style={{
-                        borderBottom: `1px solid ${T.borderSubtle}`,
-                        transition: 'background .12s',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = T.surfaceHi)}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                  {[
+                    '#',
+                    'Role',
+                    'Permissions',
+                    'Created By',
+                    'Last Updated',
+                    'Actions',
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className={`px-5 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap ${h === 'Actions' ? 'text-right' : ''}`}
                     >
-                      <td style={{ padding: '14px 16px', fontSize: 13, color: T.textLo, fontWeight: 600 }}>
-                        {(page - 1) * PAGE_SIZE + i + 1}
-                      </td>
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div
-                            style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: 10,
-                              background: `${roleColor}15`,
-                              border: `1px solid ${roleColor}30`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <RoleIcon size={18} color={roleColor} />
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 600, fontSize: 14, color: T.text }}>{role.role}</div>
-                            <div style={{ fontSize: 12, color: T.textLo }}>
-                              {role.permissions.length} permission{role.permissions.length !== 1 ? 's' : ''}
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700/50">
+                {paginated.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-14 text-center">
+                      <ShieldCheck
+                        size={36}
+                        className="mx-auto text-gray-200 dark:text-gray-600 mb-3"
+                      />
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        No roles match your search
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  paginated.map((role, i) => {
+                    const rc = PREDEFINED_ROLES.find(
+                      (r) => r.value === role.role
+                    );
+                    const RoleIcon = rc?.icon || ShieldCheck;
+                    return (
+                      <tr
+                        key={role.id}
+                        className="hover:bg-gray-50/70 dark:hover:bg-gray-700/20 transition-colors"
+                      >
+                        <td className="px-5 py-4 text-sm text-gray-400 dark:text-gray-500">
+                          {(safePage - 1) * PAGE_SIZE + i + 1}
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-2.5">
+                            <div
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center ${rc?.bg || 'bg-gray-100 dark:bg-gray-700'}`}
+                            >
+                              <RoleIcon
+                                size={15}
+                                className={rc?.color || 'text-gray-500'}
+                              />
+                            </div>
+                            <div>
+                              <div className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                                {role.role}
+                              </div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500">
+                                {role.permissions.length} permission
+                                {role.permissions.length !== 1 ? 's' : ''}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: 300 }}>
-                          {role.permissions.slice(0, 3).map((perm) => (
-                            <span
-                              key={perm}
-                              style={{
-                                padding: '3px 8px',
-                                borderRadius: 6,
-                                background: T.accentLo,
-                                border: `1px solid ${T.accent}30`,
-                                fontSize: 11,
-                                fontWeight: 600,
-                                color: T.accent,
-                                whiteSpace: 'nowrap',
-                              }}
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex flex-wrap gap-1.5 max-w-xs">
+                            {role.permissions.slice(0, 3).map((perm) => (
+                              <span
+                                key={perm}
+                                className="text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-lg font-medium whitespace-nowrap"
+                              >
+                                {perm}
+                              </span>
+                            ))}
+                            {role.permissions.length > 3 && (
+                              <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-lg font-medium">
+                                +{role.permissions.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                          {role.createdBy}
+                        </td>
+                        <td className="px-5 py-4 text-xs text-gray-400 dark:text-gray-500">
+                          {role.updatedAt}
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => openView(role)}
+                              title="View"
+                              className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 flex items-center justify-center transition-all border border-blue-100 dark:border-blue-900"
                             >
-                              {perm}
-                            </span>
-                          ))}
-                          {role.permissions.length > 3 && (
-                            <span
-                              style={{
-                                padding: '3px 8px',
-                                borderRadius: 6,
-                                background: T.surfaceHi,
-                                border: `1px solid ${T.borderSubtle}`,
-                                fontSize: 11,
-                                fontWeight: 600,
-                                color: T.textLo,
-                              }}
+                              <Eye size={13} />
+                            </button>
+                            <button
+                              onClick={() => openEdit(role)}
+                              title="Edit"
+                              className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center justify-center transition-all border border-amber-100 dark:border-amber-900"
                             >
-                              +{role.permissions.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td style={{ padding: '14px 16px', fontSize: 13, color: T.textMid }}>{role.createdBy}</td>
-                      <td style={{ padding: '14px 16px', fontSize: 12, color: T.textLo }}>{role.updatedAt}</td>
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <ActionBtn icon={Eye} color={T.accent} title="View" onClick={() => openView(role)} />
-                          <ActionBtn icon={Pencil} color={T.warn} title="Edit" onClick={() => openEdit(role)} />
-                          <ActionBtn
-                            icon={Trash2}
-                            color={T.danger}
-                            title="Delete"
-                            onClick={() => confirmDelete(role)}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                              <Pencil size={13} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(role)}
+                              title="Delete"
+                              className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 flex items-center justify-center transition-all border border-red-100 dark:border-red-900"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
 
-          {/* ── Pagination ────────────────────────────────────────────── */}
-          {totalPages > 1 && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                padding: '16px 20px',
-                borderTop: `1px solid ${T.borderSubtle}`,
-                background: T.surfaceHi,
-              }}
-            >
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Showing{' '}
+              {filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1}–
+              {Math.min(safePage * PAGE_SIZE, filtered.length)} of{' '}
+              {filtered.length} entries
+            </p>
+            <div className="flex items-center gap-1">
               <button
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-                style={{
-                  ...getStyles(T, isDark).pgBtn,
-                  opacity: page === 1 ? 0.35 : 1,
-                  cursor: page === 1 ? 'not-allowed' : 'pointer',
-                }}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage === 1}
+                className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition-all"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={14} />
               </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setPage(n)}
-                  style={{
-                    ...getStyles(T, isDark).pgBtn,
-                    background: n === page ? T.accent : T.surface,
-                    color: n === page ? '#fff' : T.textMid,
-                    borderColor: n === page ? T.accent : T.borderSubtle,
-                    fontWeight: n === page ? 700 : 500,
-                    boxShadow: n === page ? `0 2px 8px ${T.accent}40` : 'none',
-                  }}
-                >
-                  {n}
-                </button>
-              ))}
-
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(
+                  (p) =>
+                    p === 1 || p === totalPages || Math.abs(p - safePage) <= 1
+                )
+                .reduce((acc, p, i, arr) => {
+                  if (i > 0 && p - arr[i - 1] > 1) acc.push('…');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, i) =>
+                  typeof p === 'string' ? (
+                    <span
+                      key={i}
+                      className="w-8 h-8 flex items-center justify-center text-xs text-gray-400"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`w-8 h-8 rounded-lg border text-xs font-medium transition-all
+                        ${safePage === p ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'}`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
               <button
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                style={{
-                  ...getStyles(T, isDark).pgBtn,
-                  opacity: page === totalPages ? 0.35 : 1,
-                  cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                }}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage === totalPages}
+                className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition-all"
               >
-                <ChevronRight size={16} />
+                <ChevronRight size={14} />
               </button>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* ── ADD Modal ─────────────────────────────────────────────────── */}
+        {/* ── ADD Modal ──────────────────────────────────────────────────── */}
         {modal === 'add' && (
-          <div style={getStyles(T, isDark).overlay} onClick={closeModal}>
+          <RoleModal
+            titleText="Add New Role"
+            headerClass="bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/30"
+            iconEl={
+              <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <Plus size={14} />
+              </div>
+            }
+            footerBtn={
+              <button
+                onClick={handleSaveNew}
+                disabled={saving}
+                className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl transition-colors shadow-sm ${saving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'}`}
+              >
+                {saving ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  <>
+                    <Check size={13} />
+                    Create Role
+                  </>
+                )}
+              </button>
+            }
+          >
+            <F label="Role Name" required error={formErrors.role}>
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                className={formErrors.role ? inpErr : inp}
+              >
+                <option value="">Select a role</option>
+                {PREDEFINED_ROLES.map((r) => (
+                  <option key={r.value} value={r.value}>
+                    {r.value}
+                  </option>
+                ))}
+              </select>
+            </F>
+            <F label="Permissions" required error={formErrors.permissions}>
+              <PermissionGrid
+                permissions={form.permissions}
+                onChange={togglePermission}
+              />
+            </F>
+          </RoleModal>
+        )}
+
+        {/* ── VIEW Modal ─────────────────────────────────────────────────── */}
+        {modal === 'view' && selected && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={closeModal}
+          >
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
             <div
-              style={{ ...getStyles(T, isDark).modal, maxWidth: 620 }}
+              className="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <ModalHeader title="Add New Role" icon={<Plus size={20} color={T.accentHi} />} onClose={closeModal} theme={T} />
-
-              <FormField label="Role Name" error={formErrors.role}>
-                <select
-                  style={inputStyle}
-                  value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  onFocus={(e) => (e.target.style.borderColor = T.accent)}
-                  onBlur={(e) => (e.target.style.borderColor = T.borderSubtle)}
+              <div className="flex items-center justify-between px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-b border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                    <Eye size={14} />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    Role Details
+                  </span>
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="w-7 h-7 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-500 transition-all"
                 >
-                  <option value="">Select a role</option>
-                  {PREDEFINED_ROLES.map((r) => (
-                    <option key={r.value} value={r.value}>
-                      {r.value}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-
-              <FormField label="Permissions" error={formErrors.permissions}>
-                <div style={{ maxHeight: 280, overflowY: 'auto', paddingRight: 4 }}>
-                  {Object.entries(permissionsByCategory).map(([category, perms]) => (
-                    <div key={category} style={{ marginBottom: 16 }}>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: T.textLo,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          marginBottom: 8,
-                        }}
-                      >
-                        {category}
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
-                        {perms.map((perm) => {
-                          const isChecked = form.permissions.includes(perm.label);
-                          return (
-                            <label
-                              key={perm.id}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                padding: '8px 12px',
-                                borderRadius: 8,
-                                border: `1px solid ${isChecked ? T.accent : T.borderSubtle}`,
-                                background: isChecked ? T.accentLo : T.surfaceAlt,
-                                cursor: 'pointer',
-                                transition: 'all .15s',
-                                fontSize: 13,
-                                fontWeight: 500,
-                                color: isChecked ? T.accent : T.text,
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!isChecked) {
-                                  e.currentTarget.style.background = T.surfaceHi;
-                                  e.currentTarget.style.borderColor = T.textLo;
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!isChecked) {
-                                  e.currentTarget.style.background = T.surfaceAlt;
-                                  e.currentTarget.style.borderColor = T.borderSubtle;
-                                }
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => togglePermission(perm.label)}
-                                style={{ display: 'none' }}
-                              />
-                              <div
-                                style={{
-                                  width: 18,
-                                  height: 18,
-                                  borderRadius: 4,
-                                  border: `2px solid ${isChecked ? T.accent : T.borderSubtle}`,
-                                  background: isChecked ? T.accent : 'transparent',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all .15s',
-                                }}
-                              >
-                                {isChecked && <Check size={12} color="#fff" strokeWidth={3} />}
-                              </div>
-                              {perm.label}
-                            </label>
-                          );
-                        })}
-                      </div>
+                  <X size={14} />
+                </button>
+              </div>
+              <div className="p-5">
+                <div className="divide-y divide-gray-100 dark:divide-gray-700 mb-4">
+                  {[
+                    ['Role Name', selected.role],
+                    ['Created By', selected.createdBy],
+                    ['Created At', selected.createdAt],
+                    ['Last Edited By', selected.editedBy],
+                    ['Last Updated', selected.updatedAt],
+                  ].map(([label, val]) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between py-3"
+                    >
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        {label}
+                      </span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                        {val}
+                      </span>
                     </div>
                   ))}
                 </div>
-              </FormField>
-
-              <ModalFooter theme={T} isDark={isDark}>
-                <button style={getStyles(T, isDark).btnGhost} onClick={closeModal}>
-                  Cancel
-                </button>
-                <button style={getStyles(T, isDark).btnAccent} onClick={handleSaveNew}>
-                  Create Role
-                </button>
-              </ModalFooter>
-            </div>
-          </div>
-        )}
-
-        {/* ── VIEW Modal ────────────────────────────────────────────────── */}
-        {modal === 'view' && selected && (
-          <div style={getStyles(T, isDark).overlay} onClick={closeModal}>
-            <div style={{ ...getStyles(T, isDark).modal, maxWidth: 580 }} onClick={(e) => e.stopPropagation()}>
-              <ModalHeader title="Role Details" icon={<Eye size={20} color={T.accentHi} />} onClose={closeModal} theme={T} />
-
-              {/* Role Info */}
-              <div style={{ marginBottom: 20 }}>
-                {[
-                  ['Role Name', selected.role],
-                  ['Created By', selected.createdBy],
-                  ['Created At', selected.createdAt],
-                  ['Last Edited By', selected.editedBy],
-                  ['Last Updated', selected.updatedAt],
-                ].map(([label, val]) => (
-                  <div
-                    key={label}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '11px 0',
-                      borderBottom: `1px solid ${T.borderSubtle}`,
-                    }}
-                  >
-                    <span style={{ color: T.textLo, fontSize: 13, fontWeight: 600 }}>{label}</span>
-                    <span style={{ color: T.text, fontSize: 13, fontWeight: 500 }}>{val}</span>
+                <div>
+                  <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                    Permissions ({selected.permissions.length})
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {selected.permissions.map((perm) => (
+                      <span
+                        key={perm}
+                        className="text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 px-2.5 py-1 rounded-lg font-medium"
+                      >
+                        {perm}
+                      </span>
+                    ))}
                   </div>
-                ))}
-              </div>
-
-              {/* Permissions */}
-              <div>
-                <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: T.text }}>
-                  Permissions ({selected.permissions.length})
-                </h4>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {selected.permissions.map((perm) => (
-                    <span
-                      key={perm}
-                      style={{
-                        padding: '6px 12px',
-                        borderRadius: 8,
-                        background: T.accentLo,
-                        border: `1px solid ${T.accent}30`,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: T.accent,
-                      }}
-                    >
-                      {perm}
-                    </span>
-                  ))}
                 </div>
               </div>
-
-              <ModalFooter theme={T} isDark={isDark}>
-                <button style={getStyles(T, isDark).btnGhost} onClick={closeModal}>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                >
                   Close
                 </button>
                 <button
-                  style={getStyles(T, isDark).btnAccent}
                   onClick={() => {
                     closeModal();
                     setTimeout(() => openEdit(selected), 60);
                   }}
+                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-colors shadow-sm shadow-amber-200"
                 >
-                  Edit
+                  <Pencil size={13} /> Edit
                 </button>
-              </ModalFooter>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ── EDIT Modal ────────────────────────────────────────────────── */}
+        {/* ── EDIT Modal ─────────────────────────────────────────────────── */}
         {modal === 'edit' && (
-          <div style={getStyles(T, isDark).overlay} onClick={closeModal}>
+          <RoleModal
+            titleText="Edit Role"
+            headerClass="bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30"
+            iconEl={
+              <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <Pencil size={13} />
+              </div>
+            }
+            footerBtn={
+              <button
+                onClick={handleSaveEdit}
+                disabled={saving}
+                className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl transition-colors shadow-sm ${saving ? 'bg-amber-400 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 shadow-amber-200'}`}
+              >
+                {saving ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  <>
+                    <Check size={13} />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            }
+          >
+            <F label="Role Name">
+              <input
+                value={form.role}
+                disabled
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700/60 text-gray-400 dark:text-gray-500 cursor-not-allowed outline-none"
+              />
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                Role name cannot be changed
+              </p>
+            </F>
+            <F label="Permissions" required error={formErrors.permissions}>
+              <PermissionGrid
+                permissions={form.permissions}
+                onChange={togglePermission}
+              />
+            </F>
+          </RoleModal>
+        )}
+
+        {/* ── DELETE Confirm ─────────────────────────────────────────────── */}
+        {deleteTarget && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setDeleteTarget(null)}
+          >
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
             <div
-              style={{ ...getStyles(T, isDark).modal, maxWidth: 620 }}
+              className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 text-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <ModalHeader title="Edit Role" icon={<Pencil size={20} color={T.warn} />} onClose={closeModal} theme={T} />
-
-              <FormField label="Role Name">
-                <input
-                  style={{ ...inputStyle, background: T.surfaceHi, cursor: 'not-allowed' }}
-                  value={form.role}
-                  disabled
-                />
-                <div style={{ marginTop: 4, fontSize: 11, color: T.textLo }}>Role name cannot be changed</div>
-              </FormField>
-
-              <FormField label="Permissions" error={formErrors.permissions}>
-                <div style={{ maxHeight: 280, overflowY: 'auto', paddingRight: 4 }}>
-                  {Object.entries(permissionsByCategory).map(([category, perms]) => (
-                    <div key={category} style={{ marginBottom: 16 }}>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: T.textLo,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          marginBottom: 8,
-                        }}
-                      >
-                        {category}
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
-                        {perms.map((perm) => {
-                          const isChecked = form.permissions.includes(perm.label);
-                          return (
-                            <label
-                              key={perm.id}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                padding: '8px 12px',
-                                borderRadius: 8,
-                                border: `1px solid ${isChecked ? T.accent : T.borderSubtle}`,
-                                background: isChecked ? T.accentLo : T.surfaceAlt,
-                                cursor: 'pointer',
-                                transition: 'all .15s',
-                                fontSize: 13,
-                                fontWeight: 500,
-                                color: isChecked ? T.accent : T.text,
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!isChecked) {
-                                  e.currentTarget.style.background = T.surfaceHi;
-                                  e.currentTarget.style.borderColor = T.textLo;
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!isChecked) {
-                                  e.currentTarget.style.background = T.surfaceAlt;
-                                  e.currentTarget.style.borderColor = T.borderSubtle;
-                                }
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => togglePermission(perm.label)}
-                                style={{ display: 'none' }}
-                              />
-                              <div
-                                style={{
-                                  width: 18,
-                                  height: 18,
-                                  borderRadius: 4,
-                                  border: `2px solid ${isChecked ? T.accent : T.borderSubtle}`,
-                                  background: isChecked ? T.accent : 'transparent',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all .15s',
-                                }}
-                              >
-                                {isChecked && <Check size={12} color="#fff" strokeWidth={3} />}
-                              </div>
-                              {perm.label}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </FormField>
-
-              <ModalFooter theme={T} isDark={isDark}>
-                <button style={getStyles(T, isDark).btnGhost} onClick={closeModal}>
+              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+                <Trash2 size={22} className="text-red-500" />
+              </div>
+              <h3 className="text-base font-bold text-gray-800 dark:text-white mb-1">
+                Delete Role?
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
+                  "{deleteTarget.role}"
+                </span>{' '}
+                and all its permissions will be permanently removed.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  className="flex-1 py-2.5 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                >
                   Cancel
                 </button>
-                <button style={getStyles(T, isDark).btnAccent} onClick={handleSaveEdit}>
-                  Save Changes
+                <button
+                  onClick={executeDelete}
+                  className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm shadow-red-200"
+                >
+                  Delete
                 </button>
-              </ModalFooter>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* ── DELETE Confirm ────────────────────────────────────────────── */}
-        {deleteTarget && (
-          <DeleteConfirm
-            role={deleteTarget}
-            onCancel={() => setDeleteTarget(null)}
-            onConfirm={executeDelete}
-            theme={T}
-          />
         )}
       </div>
     </DashboardLayout>
   );
 }
-
-// ─── Modal Sub-Components ──────────────────────────────────────────────────
-function ModalHeader({ title, icon, onClose, theme }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 22,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 11,
-            background: theme.accentLo,
-            border: `1px solid ${theme.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {icon}
-        </div>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: theme.text }}>{title}</h2>
-      </div>
-      <button
-        onClick={onClose}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: theme.textLo,
-          padding: 4,
-          borderRadius: 6,
-          transition: 'all .15s',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = theme.surfaceHi;
-          e.currentTarget.style.color = theme.text;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'none';
-          e.currentTarget.style.color = theme.textLo;
-        }}
-      >
-        <X size={20} />
-      </button>
-    </div>
-  );
-}
-
-function ModalFooter({ children, theme, isDark }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        gap: 10,
-        marginTop: 24,
-        paddingTop: 20,
-        borderTop: `1px solid ${theme.borderSubtle}`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// ─── Styles Function ───────────────────────────────────────────────────────
-const getStyles = (T, isDark) => ({
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    background: T.overlayBg,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 9999,
-    backdropFilter: 'blur(3px)',
-  },
-  modal: {
-    background: T.surface,
-    borderRadius: 20,
-    border: `1px solid ${T.border}`,
-    padding: '32px 30px',
-    width: '90%',
-    maxWidth: 480,
-    boxShadow: T.shadow,
-    maxHeight: '90vh',
-    overflowY: 'auto',
-  },
-  btnAccent: {
-    padding: '9px 22px',
-    borderRadius: 10,
-    border: 'none',
-    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 700,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    boxShadow: T.shadowSm,
-    transition: 'box-shadow .2s',
-  },
-  btnGhost: {
-    padding: '9px 22px',
-    borderRadius: 10,
-    border: `1px solid ${T.borderSubtle}`,
-    background: T.surfaceHi,
-    color: T.textMid,
-    fontSize: 14,
-    fontWeight: 600,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    transition: 'all .15s',
-  },
-  pgBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
-    border: `1px solid ${T.borderSubtle}`,
-    background: T.surface,
-    color: T.textMid,
-    fontSize: 13,
-    fontWeight: 500,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all .15s',
-    boxShadow: isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)',
-  },
-});

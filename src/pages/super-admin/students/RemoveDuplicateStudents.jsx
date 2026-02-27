@@ -15,7 +15,7 @@ import {
   X,
   LayoutGrid,
 } from 'lucide-react';
-import DashboardLayout from '../../../../components/layout/DashboardLayout';
+import DashboardLayout from '../../../components/layout/DashboardLayout';
 
 /* ─── Sample student data with intentional duplicates ─── */
 const ALL_STUDENTS = [

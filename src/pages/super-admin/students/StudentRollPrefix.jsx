@@ -4,6 +4,7 @@ import {
   ChevronRight, Plus, Pencil, Trash2, Search, Hash,
   Check, AlertCircle, X, ChevronLeft,
 } from 'lucide-react';
+import DashboardLayout from '../../../components/layout/DashboardLayout';
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 const inp = `w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-600
@@ -15,7 +16,7 @@ const inpErr = `w-full px-3 py-2.5 text-sm rounded-xl border border-red-400
 const Breadcrumb = ({ items }) => (
   <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
     {items.map((item, i) => (
-      <React.Fragment key={item}>
+      <React.Fragment key={`${item}-${i}`}>
         <span className={i === items.length - 1
           ? 'text-gray-700 dark:text-gray-200 font-semibold'
           : 'hover:text-blue-500 cursor-pointer transition-colors'}>{item}</span>
@@ -124,12 +125,13 @@ export default function StudentRollPrefix() {
   };
 
   return (
-    <div className="space-y-5">
+    <DashboardLayout>
+      <div className="space-y-5">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <Breadcrumb items={['Dashboard', 'Student Setup', 'Student Code Prefix']} />
-          <h1 className="text-xl font-bold text-gray-800 dark:text-white">Student Code Prefix</h1>
+          <Breadcrumb items={['Dashboard', 'Student Setup', 'Student Roll Prefix']} />
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">Student Roll Prefix</h1>
         </div>
         <button onClick={openAdd}
           className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-200 flex-shrink-0">
@@ -261,7 +263,7 @@ export default function StudentRollPrefix() {
                   {modal==='add'?<Plus size={14}/>:<Pencil size={13}/>}
                 </div>
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                  {modal==='add'?'Create Student Code Prefix':'Edit Prefix'}
+                  {modal==='add'?'Create Student Roll Prefix':'Edit Prefix'}
                 </span>
               </div>
               <button onClick={closeModal} className="w-7 h-7 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-500 transition-all">
@@ -342,5 +344,6 @@ export default function StudentRollPrefix() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }

@@ -13,7 +13,7 @@ const sel = `w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 dark:b
 const Breadcrumb = ({ items }) => (
   <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
     {items.map((item, i) => (
-      <React.Fragment key={item}>
+      <React.Fragment key={`${item}-${i}`}>
         <span className={i === items.length - 1
           ? 'text-gray-700 dark:text-gray-200 font-semibold'
           : 'hover:text-blue-500 cursor-pointer transition-colors'}>{item}</span>

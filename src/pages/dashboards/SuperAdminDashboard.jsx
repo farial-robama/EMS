@@ -187,7 +187,7 @@ const SuperAdminDashboard = () => {
       description: 'Register new student',
       icon: GraduationCap,
       color: 'bg-green-600',
-      action: () => navigate('/super-admin/students/admission'),
+      action: () => navigate('/super-admin/students/add'),
     },
     {
       id: 'add-teacher',
@@ -203,7 +203,7 @@ const SuperAdminDashboard = () => {
       description: 'View all users',
       icon: Users,
       color: 'bg-blue-600',
-      action: () => navigate('/super-admin/users'),
+      action: () => navigate('/super-admin/users/roles'),
     },
     {
       id: 'view-reports',
@@ -211,7 +211,7 @@ const SuperAdminDashboard = () => {
       description: 'Generate reports',
       icon: Activity,
       color: 'bg-orange-600',
-      action: () => navigate('/super-admin/reports'),
+      action: () => navigate('/super-admin/reports/students'),
     },
   ];
 

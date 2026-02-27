@@ -130,7 +130,7 @@ export default function DepartmentSetup() {
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
           {['Dashboard', 'Global Configurations', 'Institute Setup', 'Department Setup'].map((item, i, arr) => (
-            <React.Fragment key={item}>
+            <React.Fragment key={`${item}-${i}`}>
               <span className={i === arr.length - 1 ? 'text-gray-700 dark:text-gray-200 font-medium' : 'hover:text-blue-500 cursor-pointer'}>
                 {item}
               </span>
