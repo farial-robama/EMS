@@ -4,6 +4,7 @@ import {
   ChevronRight, BookOpen, Search, Download, Printer,
   Eye, SlidersHorizontal, AlertCircle, Users, X,
 } from 'lucide-react';
+import DashboardLayout from '../../../components/layout/DashboardLayout';
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 const sel = `w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-600
@@ -136,7 +137,8 @@ export default function SubjectWiseStudents() {
   };
 
   return (
-    <div className="space-y-5">
+    <DashboardLayout>
+      <div className="space-y-5">
       {/* Header */}
       <div className="space-y-1">
         <Breadcrumb items={['Dashboard', 'Student Setup', 'Subject Wise Students']} />
@@ -290,5 +292,6 @@ export default function SubjectWiseStudents() {
         </>
       )}
     </div>
+    </DashboardLayout>
   );
 }

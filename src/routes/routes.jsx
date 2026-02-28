@@ -329,6 +329,39 @@ const StudentBalanceSheet = lazy(
 const PaidUnpaidReport = lazy(
   () => import('../pages/super-admin/accounts/reports/PaidUnpaidReport')
 );
+const AdmissionPaymentReport = lazy(
+  () => import('../pages/super-admin/accounts/reports/AdmissionPaymentReport')
+);
+const AdmissionPaymentSummary = lazy(
+  () => import('../pages/super-admin/accounts/reports/AdmissionPaymentSummary')
+);
+const AdmissionPaymentSummaryDetails = lazy(
+  () =>
+    import('../pages/super-admin/accounts/reports/AdmissionPaymentSummaryDetails')
+);
+const AdmissionPaymentSummaryCollection = lazy(
+  () =>
+    import('../pages/super-admin/accounts/reports/AdmissionPaymentSummaryCollection')
+);
+const AdmissionPaymentTransaction = lazy(
+  () =>
+    import('../pages/super-admin/accounts/reports/AdmissionPaymentTransaction')
+);
+const StudentPaymentDetails = lazy(
+  () => import('../pages/super-admin/accounts/reports/StudentPaymentDetails')
+);
+const StudentPaymentHistories = lazy(
+  () => import('../pages/super-admin/accounts/reports/StudentPaymentHistories')
+);
+const TransactionSummaryReport = lazy(
+  () => import('../pages/super-admin/accounts/reports/TransactionSummaryReport')
+);
+const OnlinePaymentList = lazy(
+  () => import('../pages/super-admin/accounts/reports/OnlinePaymentList')
+);
+const ApplyForAdmission = lazy(
+  () => import('../pages/super-admin/accounts/reports/ApplyForAdmission')
+);
 
 // ─── Teacher & Staff ──────────────────────────────────────────────────────────
 const AddTeacher = lazy(
@@ -383,6 +416,33 @@ const RemoveDuplicateStudent = lazy(
 );
 const StudentIDCard = lazy(
   () => import('../pages/super-admin/students/StudentIDCard')
+);
+const ShowAllStudent = lazy(
+  () => import('../pages/super-admin/students/ShowAllStudent')
+);
+const BulkStudentUpdate = lazy(
+  () => import('../pages/super-admin/students/BulkStudentUpdate')
+);
+const BulkCourseAdvising = lazy(
+  () => import('../pages/super-admin/students/BulkCourseAdvising')
+);
+const StudentListPrint = lazy(
+  () => import('../pages/super-admin/students/StudentListPrint')
+);
+const StudentListWithCategory = lazy(
+  () => import('../pages/super-admin/students/StudentListWithCategoryWise')
+);
+const StudentCountReport = lazy(
+  () => import('../pages/super-admin/students/StudentCountReport')
+);
+const StudentImageDownload = lazy(
+  () => import('../pages/super-admin/students/StudentImageDownload')
+);
+const StudentToughtList = lazy(
+  () => import('../pages/super-admin/students/StudentToughtList')
+);
+const SubjectWiseStudents = lazy(
+  () => import('../pages/super-admin/students/SubjectWiseStudents')
 );
 
 // ─── SMS Setup ────────────────────────────────────────────────────────────────
@@ -996,6 +1056,83 @@ const routes = [
     allowedRoles: SA,
     title: 'Paid Unpaid Report',
   },
+  {
+    path: '/super-admin/accounts/reports/online-payment-list',
+    element: OnlinePaymentList,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Online Payment List',
+  },
+  {
+    path: '/super-admin/accounts/reports/admission-payment-report',
+    element: AdmissionPaymentReport,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Admission Payment Report',
+  },
+  {
+    path: '/super-admin/accounts/reports/admission-payment-summary',
+    element: AdmissionPaymentSummary,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Admission Payment Summary',
+  },
+  {
+    path: '/super-admin/accounts/reports/admission-payment-summary-details',
+    element: AdmissionPaymentSummaryDetails,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Admission Payment Summary Details',
+  },
+  {
+    path: '/super-admin/accounts/reports/admission-payment-summary-collection',
+    element: AdmissionPaymentSummaryCollection,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Admission Payment Summary Collection',
+  },
+  {
+    path: '/super-admin/accounts/reports/admission-payment-transaction',
+    element: AdmissionPaymentTransaction,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Admission Payment Transaction',
+  },
+  {
+    path: '/super-admin/accounts/reports/apply-for-admission',
+    element: ApplyForAdmission,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Apply For Admission',
+  },
+  {
+    path: '/super-admin/accounts/reports/online-payment-list',
+    element: OnlinePaymentList,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Online Payment List',
+  },
+  {
+    path: '/super-admin/accounts/reports/student-payment-details',
+    element: StudentPaymentDetails,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student Payment Details',
+  },
+  {
+    path: '/super-admin/accounts/reports/student-payment-histories',
+    element: StudentPaymentHistories,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student Payment Histories',
+  },
+  {
+    path: '/super-admin/accounts/reports/transaction-summary',
+    element: TransactionSummaryReport,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Transaction Summary Report',
+  },
 
   // ── Teacher & Staff ───────────────────────────────────────────────────────
   {
@@ -1118,6 +1255,69 @@ const routes = [
     protected: true,
     allowedRoles: SA,
     title: 'Student ID Card Print',
+  },
+  {
+    path: '/super-admin/students/show-all',
+    element: ShowAllStudent,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Show All Student',
+  },
+  {
+    path: '/super-admin/students/bulk-update',
+    element: BulkStudentUpdate,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Bulk Student Update',
+  },
+  {
+    path: '/super-admin/students/bulk-course-advising',
+    element: BulkCourseAdvising,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Bulk Course Advising',
+  },
+  {
+    path: '/super-admin/students/list-print',
+    element: StudentListPrint,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student List Print',
+  },
+  {
+    path: '/super-admin/students/list-with-category',
+    element: StudentListWithCategory,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student List With Category',
+  },
+  {
+    path: '/super-admin/students/count-report',
+    element: StudentCountReport,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student Count Report',
+  },
+  {
+    path: '/super-admin/students/image-download',
+    element: StudentImageDownload,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student Image Download',
+  },
+  {
+    path: '/super-admin/students/taught-list',
+    element: StudentToughtList,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Student Taught List',
+  },
+  {
+    path: '/super-admin/students/subject-wise',
+    element: SubjectWiseStudents,
+    protected: true,
+    allowedRoles: SA,
+    title: 'Subject Wise Students',
   },
 
   // ── SMS Setup ─────────────────────────────────────────────────────────────

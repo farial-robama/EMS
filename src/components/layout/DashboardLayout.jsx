@@ -196,7 +196,7 @@ const handleLogout = () => {
           bg-white dark:bg-gray-800
           border-r border-gray-200 dark:border-gray-700
           transition-all duration-300
-          ${sidebarCollapsed ? 'w-16' : 'w-64'}
+          ${sidebarCollapsed ? 'w-16' : 'w-72'}
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:relative lg:translate-x-0
         `}
@@ -290,7 +290,7 @@ const handleLogout = () => {
                 {!sidebarCollapsed && menu.submenus && (
                   <div
                     className="overflow-hidden transition-all duration-200"
-                    style={{ maxHeight: isExpanded ? '1000px' : '0px' }}
+                    style={{ maxHeight: isExpanded ? '2000px' : '0px' }}
                   >
                     <div className="mt-0.5 ml-3 pl-2.5 border-l-2 border-gray-200 dark:border-gray-600 py-0.5 space-y-0.5">
                       {menu.submenus.map((sub) => {
@@ -318,7 +318,7 @@ const handleLogout = () => {
 
                               <div
                                 className="overflow-hidden transition-all duration-200"
-                                style={{ maxHeight: nestedExpanded ? '600px' : '0px' }}
+                                style={{ maxHeight: nestedExpanded ? '1500px' : '0px' }}
                               >
                                 <div className="mt-0.5 ml-3 pl-2.5 border-l-2 border-gray-100 dark:border-gray-700 py-0.5 space-y-0.5">
                                   {sub.submenus.map((leaf) => (

@@ -65,12 +65,6 @@ export const superAdminMenu = [
         path: '/super-admin/users/roles',
         permission: 'users.roles.view',
       },
-      // {
-      //   id: 'all-users',
-      //   label: 'All Users',
-      //   path: '/super-admin/users',
-      //   permission: 'users.view',
-      // },
     ],
   },
 
@@ -397,6 +391,72 @@ export const superAdminMenu = [
             path: '/super-admin/accounts/reports/paid-unpaid',
             permission: 'accounts.paid-unpaid.view',
           },
+          {
+            id: 'admission-payment-report',
+            label: 'Admission Payment Report',
+            path: '/super-admin/accounts/reports/admission-payment-report',
+            permission: 'accounts.admission-payment-report.view',
+          },
+          {
+            id: 'admission-payment-summary',
+            label: 'Admission Payment Summary',
+            path: '/super-admin/accounts/reports/admission-payment-summary',
+            permission: 'accounts.admission-payment-summary.view',
+          },
+           {
+            id: 'admission-payment-summary-collection',
+            label: 'Admission Payment Summary Collection',
+            path: '/super-admin/accounts/reports/admission-payment-summary-collection',
+            permission: 'accounts.admission-payment-summary-collection.view',
+          },
+          {
+            id: 'admission-payment-summary-details',
+            label: 'Admission Payment Summary Details',
+            path: '/super-admin/accounts/reports/admission-payment-summary-details',
+            permission: 'accounts.admission-payment-summary-details.view',
+          },
+          {
+            id: 'admission-payment-summary-collection',
+            label: 'Admission Payment Summary Collection',
+            path: '/super-admin/accounts/reports/admission-payment-summary-collection',
+            permission: 'accounts.admission-payment-summary-collection.view',
+          },
+          {
+            id: 'admission-payment-transaction',
+            label: 'Admission Payment Transaction',
+            path: '/super-admin/accounts/reports/admission-payment-transaction',
+            permission: 'accounts.admission-payment-transaction.view',
+          },
+          {
+            id: 'apply-for-admission',
+            label: 'Apply For Admission',
+            path: '/super-admin/accounts/reports/apply-for-admission',
+            permission: 'accounts.apply-for-admission.view',
+          },
+          {
+            id: 'online-payment-list',
+            label: 'Online Payment List',
+            path: '/super-admin/accounts/reports/online-payment-list',
+            permission: 'accounts.online-payment-list.view',
+          },
+          {
+            id: 'student-payment-details',
+            label: 'Student Payment Details',
+            path: '/super-admin/accounts/reports/student-payment-details',
+            permission: 'accounts.student-payment-details.view',
+          },
+          {
+            id: 'student-payment-histories',
+            label: 'Student Payment Histories',
+            path: '/super-admin/accounts/reports/student-payment-histories',
+            permission: 'accounts.student-payment-histories.view',
+          },
+          {
+            id: 'transaction-summary-report',
+            label: 'Transaction Summary Report',
+            path: '/super-admin/accounts/reports/transaction-summary',
+            permission: 'accounts.transaction-summary.view',
+          },
         ],
       },
     ],
@@ -406,7 +466,7 @@ export const superAdminMenu = [
   {
     id: 'teacher-staff',
     label: 'Teacher & Staff',
-    icon: Briefcase, // ✅ Fixed: was UserTie
+    icon: Briefcase, 
     permission: 'teachers.view',
     submenus: [
       {
@@ -474,10 +534,28 @@ export const superAdminMenu = [
         permission: 'students.view',
       },
       {
+        id: 'show-all-student',
+        label: 'Show All Student',
+        path: '/super-admin/students/show-all',
+        permission: 'students.show-all.view',
+      },
+      {
         id: 'student-bulk-upload',
         label: 'Student Bulk Upload',
         path: '/super-admin/students/bulk-upload',
         permission: 'students.bulk-upload',
+      },
+      {
+        id: 'bulk-student-update',
+        label: 'Bulk Student Update',
+        path: '/super-admin/students/bulk-update',
+        permission: 'students.bulk-update',
+      },
+      {
+        id: 'bulk-course-advising',
+        label: 'Bulk Course Advising',
+        path: '/super-admin/students/bulk-course-advising',
+        permission: 'students.bulk-course-advising.view',
       },
       {
         id: 'student-categories',
@@ -520,6 +598,42 @@ export const superAdminMenu = [
         label: 'Student ID Card Print',
         path: '/super-admin/students/id-card',
         permission: 'students.id-card.view',
+      },
+      {
+        id: 'student-list-print',
+        label: 'Student List Print',
+        path: '/super-admin/students/list-print',
+        permission: 'students.list-print.view',
+      },
+      {
+        id: 'student-list-with-category',
+        label: 'Student List With Category',
+        path: '/super-admin/students/list-with-category',
+        permission: 'students.list-with-category.view',
+      },
+      {
+        id: 'student-count-report',
+        label: 'Student Count Report',
+        path: '/super-admin/students/count-report',
+        permission: 'students.count-report.view',
+      },
+      {
+        id: 'student-image-download',
+        label: 'Student Image Download',
+        path: '/super-admin/students/image-download',
+        permission: 'students.image-download.view',
+      },
+      {
+        id: 'student-tought-list',
+        label: 'Student Taught List',
+        path: '/super-admin/students/taught-list',
+        permission: 'students.taught-list.view',
+      },
+      {
+        id: 'subject-wise-students',
+        label: 'Subject Wise Students',
+        path: '/super-admin/students/subject-wise',
+        permission: 'students.subject-wise.view',
       },
     ],
   },
