@@ -12,20 +12,20 @@ import Card from '../components/common/Card';
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
 
-  // Show loading spinner while checking authentication
+  
   if (isLoading) {
     return <LoadingSpinner fullScreen />;
   }
 
-  // Redirect to login if not authenticated
+  
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // Check if user has required role
+  
   const hasRequiredRole = user && user.role && allowedRoles.includes(user.role);
 
-  // Show access denied page if authenticated but role not allowed
+  
   if (!hasRequiredRole) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -73,7 +73,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     );
   }
 
-  // Render children if authenticated and has required role
+ 
   return children;
 };
 

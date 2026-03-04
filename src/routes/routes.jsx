@@ -184,67 +184,67 @@ const SystemUsers = lazy(
 // ─── Global Configurations › Institute Setup ──────────────────────────────────
 const ProfileSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/ProfileSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/ProfileSetup')
 );
 const CampusSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/CampusSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/CampusSetup')
 );
 const ShiftSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/ShiftSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/ShiftSetup')
 );
 const MediumSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/MediumSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/MediumSetup')
 );
 const EducationLevelSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/EducationLevelSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/EducationLevelSetup')
 );
 const DepartmentSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/DepartmentSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/DepartmentSetup')
 );
 const ClassSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/ClassSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/ClassSetup')
 );
 const SectionSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/SectionSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/SectionSetup')
 );
 const SubjectSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/SubjectSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/SubjectSetup')
 );
 const SessionSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/SessionSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/SessionSetup')
 );
 const SubjectSubType = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/SubjectSubType')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/SubjectSubType')
 );
 const ClassSubjects = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/ClassSubjects')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/ClassSubjects')
 );
 const BackgroundUpload = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/BackgroundUpload')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/BackgroundUpload')
 );
 const DesignationSetup = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/DesignationSetup')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/DesignationSetup')
 );
 const PaymentGatewayAPI = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/PaymentGatewayAPI')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/PaymentGatewayAPI')
 );
 const PaymentGatewayCharge = lazy(
   () =>
-    import('../pages/super-admin/globalConfigurations/instituteSetup/PaymentGatewayCharge')
+    import('../pages/super-admin/globalConfigurations/InstituteSetup/PaymentGatewayCharge')
 );
 
 // ─── Global Configurations › Other ────────────────────────────────────────────
